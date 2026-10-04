@@ -1,5 +1,6 @@
 import 'package:just_audio/just_audio.dart';
 import 'package:flutter/foundation.dart';
+import 'dart:async';
 
 /// Represents the current playback state of the Bhagavad Gita audio.
 enum AudioPlaybackState {
@@ -38,8 +39,8 @@ class AudioPlayerController extends ChangeNotifier {
   // Stream subscriptions for cleanup
   StreamSubscription? _durationSubscription;
   StreamSubscription? _positionSubscription;
-  StreamSubscription? _playerStateSubscription;
-  StreamSubscription? _errorSubscription;
+  StreamSubscription? _playingSubscription;
+  StreamSubscription? _processingStateSubscription;
 
   AudioPlaybackState get state => _state;
   Duration get duration => _duration;
@@ -103,11 +104,8 @@ class AudioPlayerController extends ChangeNotifier {
 
       _audioAssetPath = audioAssetPath;
 
-      // Use AssetSource for bundled assets
-      await _audioPlayer.setAudioSource(
-        AssetSource(audioAssetPath),
-        initialPosition: Duration.zero,
-      );
+      // Use setUrl for asset files in just_audio 0.9.x
+      await _audioPlayer.setUrl('asset://$audioAssetPath');
 
       if (_isDisposed) {
         return;
@@ -115,6 +113,8 @@ class AudioPlayerController extends ChangeNotifier {
 
       _isInitialized = true;
       _position = Duration.zero;
+
+      _attachListeners();
 
       _setState(AudioPlaybackState.paused);
     } catch (error, stackTrace) {
@@ -383,13 +383,27 @@ class AudioPlayerController extends ChangeNotifier {
       notifyListeners();
     });
 
-    // Player state changed
-    _playerStateSubscription = _audioPlayer.playerStateStream.listen((playerState) {
+    // Track playing state via playingStream
+    _playingSubscription = _audioPlayer.playingStream.listen((playing) {
       if (_isDisposed) return;
 
-      // Determine our state from playerState
-      final processingState = playerState.processingState;
-      final playing = playerState.playing;
+      if (playing) {
+        _setState(AudioPlaybackState.playing);
+      } else if (_state == AudioPlaybackState.playing) {
+        // If we were playing and now stopped, check processing state
+        final processingState = _audioPlayer.processingState;
+        if (processingState == ProcessingState.completed) {
+          _position = _duration;
+          _setState(AudioPlaybackState.completed);
+        } else {
+          _setState(AudioPlaybackState.paused);
+        }
+      }
+    });
+
+    // Track processing state via processingStateStream
+    _processingStateSubscription = _audioPlayer.processingStateStream.listen((processingState) {
+      if (_isDisposed) return;
 
       if (processingState == ProcessingState.loading ||
           processingState == ProcessingState.buffering) {
@@ -399,49 +413,28 @@ class AudioPlayerController extends ChangeNotifier {
       } else if (processingState == ProcessingState.completed) {
         _position = _duration;
         _setState(AudioPlaybackState.completed);
-      } else if (playing) {
-        _setState(AudioPlaybackState.playing);
-      } else {
-        _setState(AudioPlaybackState.paused);
+      } else if (processingState == ProcessingState.ready) {
+        // Check if we should be playing based on playing state
+        if (_audioPlayer.playing) {
+          _setState(AudioPlaybackState.playing);
+        } else if (_state == AudioPlaybackState.loading) {
+          // If we just finished loading and not playing, pause
+          _setState(AudioPlaybackState.paused);
+        }
       }
-    });
-
-    // Error handling
-    _errorSubscription = _audioPlayer.playerStateStream.listen((playerState) {
-      if (_isDisposed) return;
-
-      final error = playerState.playbackError;
-      if (error != null) {
-        debugPrint(
-          'AudioPlayerController: player error: $error',
-        );
-
-        _operationInProgress = false;
-        _setState(AudioPlaybackState.error);
-      }
-    }, onError: (error, stackTrace) {
-      if (_isDisposed) return;
-
-      debugPrint(
-        'AudioPlayerController: player error stream error: $error',
-      );
-      debugPrint('$stackTrace');
-
-      _operationInProgress = false;
-      _setState(AudioPlaybackState.error);
     });
   }
 
   Future<void> _detachListeners() async {
     await _durationSubscription?.cancel();
     await _positionSubscription?.cancel();
-    await _playerStateSubscription?.cancel();
-    await _errorSubscription?.cancel();
+    await _playingSubscription?.cancel();
+    await _processingStateSubscription?.cancel();
 
     _durationSubscription = null;
     _positionSubscription = null;
-    _playerStateSubscription = null;
-    _errorSubscription = null;
+    _playingSubscription = null;
+    _processingStateSubscription = null;
   }
 
   Duration _clampPosition(Duration value) {
@@ -496,15 +489,15 @@ class AudioPlayerController extends ChangeNotifier {
 
     _durationSubscription?.cancel();
     _positionSubscription?.cancel();
-    _playerStateSubscription?.cancel();
-    _errorSubscription?.cancel();
+    _playingSubscription?.cancel();
+    _processingStateSubscription?.cancel();
 
     _durationSubscription = null;
     _positionSubscription = null;
-    _playerStateSubscription = null;
-    _errorSubscription = null;
+    _playingSubscription = null;
+    _processingStateSubscription = null;
 
-    unawaited(_audioPlayer.dispose());
+    _audioPlayer.dispose();
 
     super.dispose();
   }
