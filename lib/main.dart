@@ -90,7 +90,7 @@ class _GitaPlayerScreenState extends State<GitaPlayerScreen> {
 
   Future<void> _initAudio() async {
     try {
-      await _playerController.initialize('audio.m4a');
+      await _playerController.initialize('assets/audio.m4a');
     } on AudioInitializationException catch (e) {
       debugPrint('Error loading audio: $e');
       if (mounted) {

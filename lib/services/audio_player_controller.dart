@@ -1,4 +1,5 @@
 import 'package:just_audio/just_audio.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 import 'package:flutter/foundation.dart';
 import 'dart:async';
 
@@ -104,8 +105,22 @@ class AudioPlayerController extends ChangeNotifier {
 
       _audioAssetPath = audioAssetPath;
 
-      // Use setUrl for asset files in just_audio 0.9.x
-      await _audioPlayer.setUrl('asset://$audioAssetPath');
+      // Clear any stale asset cache from previous bad runs before loading.
+      // This is safe to call even on a clean install.
+      await AudioPlayer.clearAssetCache();
+
+      // Use setAsset() — the correct API for Flutter bundled assets.
+      // The tag: MediaItem is required by just_audio_background for media
+      // session / notification metadata.
+      await _audioPlayer.setAsset(
+        audioAssetPath,
+        tag: MediaItem(
+          id: audioAssetPath,
+          title: 'Bhagavad Gita',
+          artist: 'Bhagavad Gita',
+          album: 'Bhagavad Gita',
+        ),
+      );
 
       if (_isDisposed) {
         return;
