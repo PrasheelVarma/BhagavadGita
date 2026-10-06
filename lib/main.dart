@@ -48,11 +48,11 @@ class BhagavadGitaApp extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
           ),
         ),
-        sliderTheme: SliderThemeData(
-          activeTrackColor: const Color(0xFFD32F2F),
-          inactiveTrackColor: const Color(0xFFFFCDD2),
-          thumbColor: const Color(0xFFD32F2F),
-          overlayColor: const Color(0x33D32F2F),
+        sliderTheme: const SliderThemeData(
+          activeTrackColor: Color(0xFFD32F2F),
+          inactiveTrackColor: Color(0xFFFFCDD2),
+          thumbColor: Color(0xFFD32F2F),
+          overlayColor: Color(0x33D32F2F),
           trackHeight: 6,
         ),
       ),

@@ -70,12 +70,12 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                   ),
                 ),
                 const SizedBox(height: 24),
-                Text(
+                const Text(
                   'श्रीमद्भगवद्गीता',
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: const Color(0xFFD32F2F),
+                    color: Color(0xFFD32F2F),
                     letterSpacing: 1.1,
                   ),
                 ),
