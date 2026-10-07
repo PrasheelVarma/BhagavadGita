@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:audio_session/audio_session.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 
 import 'package:bhagavad_gita/screens/player_screen.dart';
@@ -14,6 +15,10 @@ void main() async {
     androidNotificationChannelName: 'Bhagavad Gita Playback',
     androidNotificationOngoing: true,
   );
+  // Configure audio session for media playback, audio focus handling,
+  // and interruption / headphone disconnect handling.
+  final session = await AudioSession.instance;
+  await session.configure(const AudioSessionConfiguration.music());
   runApp(const BhagavadGitaApp());
 }
 

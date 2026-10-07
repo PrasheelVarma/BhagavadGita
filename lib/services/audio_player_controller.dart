@@ -1,3 +1,4 @@
+import 'package:audio_session/audio_session.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:flutter/foundation.dart';
@@ -40,8 +41,8 @@ class AudioPlayerController extends ChangeNotifier {
   // Stream subscriptions for cleanup
   StreamSubscription? _durationSubscription;
   StreamSubscription? _positionSubscription;
-  StreamSubscription? _playingSubscription;
-  StreamSubscription? _processingStateSubscription;
+  StreamSubscription? _playerStateSubscription;
+  StreamSubscription? _becomingNoisySubscription;
 
   AudioPlaybackState get state => _state;
   Duration get duration => _duration;
@@ -108,6 +109,10 @@ class AudioPlayerController extends ChangeNotifier {
       // Clear any stale asset cache from previous bad runs before loading.
       // This is safe to call even on a clean install.
       await AudioPlayer.clearAssetCache();
+
+      // Configure audio session for media playback, focus, and interruptions.
+      final session = await AudioSession.instance;
+      await session.configure(const AudioSessionConfiguration.music());
 
       // Use setAsset() — the correct API for Flutter bundled assets.
       // The tag: MediaItem is required by just_audio_background for media
@@ -390,35 +395,32 @@ class AudioPlayerController extends ChangeNotifier {
       notifyListeners();
     });
 
-    // Position changed
+    // Position changed (synchronized with internal and external seeks)
     _positionSubscription = _audioPlayer.positionStream.listen((position) {
       if (_isDisposed) return;
 
       _position = _clampPosition(position);
-      notifyListeners();
-    });
 
-    // Track playing state via playingStream
-    _playingSubscription = _audioPlayer.playingStream.listen((playing) {
-      if (_isDisposed) return;
-
-      if (playing) {
-        _setState(AudioPlaybackState.playing);
-      } else if (_state == AudioPlaybackState.playing) {
-        // If we were playing and now stopped, check processing state
-        final processingState = _audioPlayer.processingState;
-        if (processingState == ProcessingState.completed) {
-          _position = _duration;
-          _setState(AudioPlaybackState.completed);
-        } else {
-          _setState(AudioPlaybackState.paused);
-        }
+      // If an external seek (e.g. from notification slider or lock screen)
+      // moves away from the end, update completed state.
+      if (isCompleted && _position < _duration) {
+        _setState(_audioPlayer.playing
+            ? AudioPlaybackState.playing
+            : AudioPlaybackState.paused);
+      } else {
+        notifyListeners();
       }
     });
 
-    // Track processing state via processingStateStream
-    _processingStateSubscription = _audioPlayer.processingStateStream.listen((processingState) {
+    // Track combined player state for synchronized play/pause/loading/completion
+    // across in-app controls, external media session (lock screen / notification),
+    // Bluetooth devices, and Android audio focus interruptions.
+    _playerStateSubscription =
+        _audioPlayer.playerStateStream.listen((playerState) {
       if (_isDisposed) return;
+
+      final playing = playerState.playing;
+      final processingState = playerState.processingState;
 
       if (processingState == ProcessingState.loading ||
           processingState == ProcessingState.buffering) {
@@ -428,28 +430,44 @@ class AudioPlayerController extends ChangeNotifier {
       } else if (processingState == ProcessingState.completed) {
         _position = _duration;
         _setState(AudioPlaybackState.completed);
-      } else if (processingState == ProcessingState.ready) {
-        // Check if we should be playing based on playing state
-        if (_audioPlayer.playing) {
+        // Pause underlying player on completion to keep external media controls
+        // (notification / lock screen / Bluetooth) synchronized to Play state.
+        if (playing) {
+          _audioPlayer.pause();
+        }
+      } else if (processingState == ProcessingState.ready ||
+          processingState == ProcessingState.idle) {
+        if (playing) {
           _setState(AudioPlaybackState.playing);
-        } else if (_state == AudioPlaybackState.loading) {
-          // If we just finished loading and not playing, pause
-          _setState(AudioPlaybackState.paused);
+        } else {
+          // If we are at the end, remain completed unless seeked
+          if (!isCompleted) {
+            _setState(AudioPlaybackState.paused);
+          }
         }
       }
+    });
+
+    // Headphone / Bluetooth disconnect (becoming noisy) handler
+    AudioSession.instance.then((session) {
+      if (_isDisposed) return;
+      _becomingNoisySubscription = session.becomingNoisyEventStream.listen((_) {
+        if (_isDisposed) return;
+        pause();
+      });
     });
   }
 
   Future<void> _detachListeners() async {
     await _durationSubscription?.cancel();
     await _positionSubscription?.cancel();
-    await _playingSubscription?.cancel();
-    await _processingStateSubscription?.cancel();
+    await _playerStateSubscription?.cancel();
+    await _becomingNoisySubscription?.cancel();
 
     _durationSubscription = null;
     _positionSubscription = null;
-    _playingSubscription = null;
-    _processingStateSubscription = null;
+    _playerStateSubscription = null;
+    _becomingNoisySubscription = null;
   }
 
   Duration _clampPosition(Duration value) {
@@ -504,13 +522,13 @@ class AudioPlayerController extends ChangeNotifier {
 
     _durationSubscription?.cancel();
     _positionSubscription?.cancel();
-    _playingSubscription?.cancel();
-    _processingStateSubscription?.cancel();
+    _playerStateSubscription?.cancel();
+    _becomingNoisySubscription?.cancel();
 
     _durationSubscription = null;
     _positionSubscription = null;
-    _playingSubscription = null;
-    _processingStateSubscription = null;
+    _playerStateSubscription = null;
+    _becomingNoisySubscription = null;
 
     _audioPlayer.dispose();
 
