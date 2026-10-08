@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
@@ -18,6 +19,9 @@ class PlayerScreen extends StatefulWidget {
 class _PlayerScreenState extends State<PlayerScreen> {
   late final AudioPlayerController _controller;
   double? _dragPosition;
+  Timer? _sleepTimer;
+  Duration? _sleepTimerRemaining;
+  Timer? _countdownTicker;
 
   @override
   void initState() {
@@ -35,6 +39,8 @@ class _PlayerScreenState extends State<PlayerScreen> {
 
   @override
   void dispose() {
+    _sleepTimer?.cancel();
+    _countdownTicker?.cancel();
     _controller.removeListener(_onControllerChanged);
     super.dispose();
   }
@@ -65,9 +71,54 @@ class _PlayerScreenState extends State<PlayerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Bhagavad Gita'),
-        centerTitle: true,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(56),
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color(0xFF8E0E00), // Deep temple vermillion
+                Color(0xFFB71C1C), // Royal devotional red
+                Color(0xFFE65100), // Sacred saffron
+              ],
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF8E0E00).withValues(alpha: 0.35),
+                blurRadius: 10,
+                offset: const Offset(0, 3),
+              ),
+            ],
+            border: const Border(
+              bottom: BorderSide(
+                color: Color(0xFFFFD54F), // Golden ornamental bottom trim
+                width: 1.5,
+              ),
+            ),
+          ),
+          child: const SafeArea(
+            child: Center(
+              child: Text(
+                'Bhagavad Gita',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.white,
+                  letterSpacing: 1.2,
+                  shadows: [
+                    Shadow(
+                      color: Colors.black38,
+                      blurRadius: 6,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
       ),
       body: Container(
         decoration: const BoxDecoration(
@@ -75,135 +126,544 @@ class _PlayerScreenState extends State<PlayerScreen> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Color(0xFFFFF3E0),
-              Color(0xFFFFE0B2),
-              Colors.white,
+              Color(0xFFFFF8E7), // Sacred warm dawn
+              Color(0xFFFFECD2), // Soft golden amber
+              Color(0xFFFFF3E0), // Saffron aura
+              Color(0xFFFAF7F2), // Divine ivory pearl
             ],
+            stops: [0.0, 0.35, 0.7, 1.0],
           ),
         ),
         child: SafeArea(
-          child: Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 24,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 20,
+              vertical: 10,
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                // 1. Unified Divine Chakra Artwork Seeker
+                _DivineChakraSeekControl(
+                  imagePath: 'assets/artwork.png',
+                  isPlaying: _controller.isPlaying,
+                  position: _dragPosition != null
+                      ? Duration(milliseconds: _dragPosition!.round())
+                      : _controller.position,
+                  duration: _controller.duration,
+                  onChanged: (duration) {
+                    if (_controller.isInitialized && !_controller.isLoading) {
+                      setState(() {
+                        _dragPosition = duration.inMilliseconds.toDouble();
+                      });
+                    }
+                  },
+                  onChangeEnd: (duration) {
+                    if (_controller.isInitialized && !_controller.isLoading) {
+                      _controller.seek(duration);
+                      setState(() {
+                        _dragPosition = null;
+                      });
+                    }
+                  },
+                ),
+
+                // 2. Horizontal seek slider & synchronized time indicators
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SliderTheme(
+                      data: SliderTheme.of(context).copyWith(
+                        trackHeight: 5,
+                        activeTrackColor: const Color(0xFFD32F2F),
+                        inactiveTrackColor: const Color(0xFFFFCC80),
+                        thumbColor: const Color(0xFFD32F2F),
+                        overlayColor: const Color(0xFFD32F2F).withValues(alpha: 0.15),
+                        thumbShape: const RoundSliderThumbShape(
+                          enabledThumbRadius: 7.5,
+                          elevation: 3,
+                        ),
+                        showValueIndicator: ShowValueIndicator.onDrag,
+                      ),
+                      child: Slider(
+                        value: _sliderValue,
+                        min: 0,
+                        max: _controller.duration > Duration.zero
+                            ? _controller.duration.inMilliseconds.toDouble()
+                            : 1,
+                        label: _formatDuration(
+                            Duration(milliseconds: _sliderValue.round())),
+                        onChanged: _controller.isInitialized && !_controller.isLoading
+                            ? (value) {
+                                setState(() {
+                                  _dragPosition = value;
+                                });
+                              }
+                            : null,
+                        onChangeEnd: _controller.isInitialized && !_controller.isLoading
+                            ? (value) {
+                                _controller.seek(
+                                  Duration(milliseconds: value.round()),
+                                );
+                                setState(() {
+                                  _dragPosition = null;
+                                });
+                              }
+                            : null,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 3,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.85),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: const Color(0xFFFFE0B2),
+                                width: 1,
+                              ),
+                            ),
+                            child: Text(
+                              _formatDuration(
+                                Duration(milliseconds: _sliderValue.round()),
+                              ),
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Color(0xFFB71C1C),
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 3,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.85),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: const Color(0xFFFFE0B2),
+                                width: 1,
+                              ),
+                            ),
+                            child: Text(
+                              _formatDuration(
+                                _controller.duration,
+                              ),
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.brown.shade700,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+
+                // 3. Devotional Media Controls Console Card
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 16,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.75),
+                    borderRadius: BorderRadius.circular(28),
+                    border: Border.all(
+                      color: const Color(0xFFFFE082),
+                      width: 1.2,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.orange.withValues(alpha: 0.10),
+                        blurRadius: 16,
+                        offset: const Offset(0, 5),
+                      ),
+                    ],
+                  ),
+                  child: _buildPlaybackControls(),
+                ),
+
+                // 4. Dedicated Devotional Utility Toolbar (Speed, Timer, Loop)
+                _buildBottomUtilityBar(),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _setSleepTimer(Duration? duration) {
+    _sleepTimer?.cancel();
+    _countdownTicker?.cancel();
+
+    if (duration == null || duration == Duration.zero) {
+      setState(() {
+        _sleepTimerRemaining = null;
+      });
+      return;
+    }
+
+    setState(() {
+      _sleepTimerRemaining = duration;
+    });
+
+    _countdownTicker = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_sleepTimerRemaining == null ||
+          _sleepTimerRemaining! <= const Duration(seconds: 1)) {
+        timer.cancel();
+      } else {
+        setState(() {
+          _sleepTimerRemaining =
+              _sleepTimerRemaining! - const Duration(seconds: 1);
+        });
+      }
+    });
+
+    _sleepTimer = Timer(duration, () {
+      _countdownTicker?.cancel();
+      setState(() {
+        _sleepTimerRemaining = null;
+      });
+      _controller.pause();
+    });
+  }
+
+  String _formatSleepTimer(Duration duration) {
+    final minutes = duration.inMinutes;
+    final seconds = duration.inSeconds % 60;
+    return '$minutes:${seconds.toString().padLeft(2, '0')}';
+  }
+
+  void _showSleepTimerSheet() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        final options = [
+          (label: 'Off', duration: null),
+          (label: '15 Minutes', duration: const Duration(minutes: 15)),
+          (label: '30 Minutes', duration: const Duration(minutes: 30)),
+          (label: '45 Minutes', duration: const Duration(minutes: 45)),
+          (label: '60 Minutes', duration: const Duration(minutes: 60)),
+        ];
+
+        return Container(
+          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
+          decoration: BoxDecoration(
+            color: const Color(0xFFFFF8E7),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+            border: Border.all(color: const Color(0xFFFFCC80), width: 1.5),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.15),
+                blurRadius: 20,
+                offset: const Offset(0, -4),
               ),
-              child: Column(
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFCC80),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const SizedBox(height: 12),
-
-                  // Unified Divine Chakra Artwork Seeker
-                  _DivineChakraSeekControl(
-                    imagePath: 'assets/artwork.png',
-                    isPlaying: _controller.isPlaying,
-                    position: _dragPosition != null
-                        ? Duration(milliseconds: _dragPosition!.round())
-                        : _controller.position,
-                    duration: _controller.duration,
-                    onChanged: (duration) {
-                      if (_controller.isInitialized && !_controller.isLoading) {
-                        setState(() {
-                          _dragPosition = duration.inMilliseconds.toDouble();
-                        });
-                      }
-                    },
-                    onChangeEnd: (duration) {
-                      if (_controller.isInitialized && !_controller.isLoading) {
-                        _controller.seek(duration);
-                        setState(() {
-                          _dragPosition = null;
-                        });
-                      }
-                    },
-                  ),
-
-                  const SizedBox(height: 28),
-
-                  const Text(
-                    'Bhagavad Gita',
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFFD32F2F),
-                      letterSpacing: 1.2,
-                    ),
-                  ),
-
-                  const SizedBox(height: 8),
-
+                  Icon(Icons.bedtime_rounded,
+                      color: Color(0xFFB71C1C), size: 20),
+                  SizedBox(width: 8),
                   Text(
-                    'Song of the Spirit',
+                    'Sleep Timer',
                     style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey[700],
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFFB71C1C),
                     ),
                   ),
-
-                  const SizedBox(height: 36),
-
-                  // Horizontal slider - synchronized with circular seeker
-                  SliderTheme(
-                    data: SliderTheme.of(context).copyWith(
-                      showValueIndicator: ShowValueIndicator.onDrag,
-                    ),
-                    child: Slider(
-                      value: _sliderValue,
-                      min: 0,
-                      max: _controller.duration > Duration.zero
-                          ? _controller.duration.inMilliseconds.toDouble()
-                          : 1,
-                      label: _formatDuration(
-                          Duration(milliseconds: _sliderValue.round())),
-                      onChanged: _controller.isInitialized && !_controller.isLoading
-                          ? (value) {
-                              setState(() {
-                                _dragPosition = value;
-                              });
-                            }
-                          : null,
-                      onChangeEnd: _controller.isInitialized && !_controller.isLoading
-                          ? (value) {
-                              _controller.seek(
-                                Duration(milliseconds: value.round()),
-                              );
-                              setState(() {
-                                _dragPosition = null;
-                              });
-                            }
-                          : null,
-                    ),
-                  ),
-
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          _formatDuration(
-                            Duration(milliseconds: _sliderValue.round()),
-                          ),
-                          style: TextStyle(color: Colors.grey.shade700, fontWeight: FontWeight.w500),
-                        ),
-                        Text(
-                          _formatDuration(
-                            _controller.duration,
-                          ),
-                          style: TextStyle(color: Colors.grey.shade700, fontWeight: FontWeight.w500),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 28),
-
-                  _buildPlaybackControls(),
-
-                  const SizedBox(height: 40),
                 ],
               ),
+              const SizedBox(height: 16),
+              ...options.map((opt) {
+                final isSelected = opt.duration == null
+                    ? _sleepTimerRemaining == null
+                    : _sleepTimerRemaining != null &&
+                        _sleepTimerRemaining!.inMinutes <=
+                            opt.duration!.inMinutes &&
+                        _sleepTimerRemaining!.inMinutes >
+                            opt.duration!.inMinutes - 15;
+                return ListTile(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  tileColor: isSelected
+                      ? const Color(0xFFD32F2F).withValues(alpha: 0.12)
+                      : Colors.transparent,
+                  leading: Icon(
+                    isSelected
+                        ? Icons.check_circle_rounded
+                        : Icons.radio_button_unchecked_rounded,
+                    color: isSelected
+                        ? const Color(0xFFD32F2F)
+                        : Colors.grey.shade400,
+                  ),
+                  title: Text(
+                    opt.label,
+                    style: TextStyle(
+                      fontWeight:
+                          isSelected ? FontWeight.bold : FontWeight.w600,
+                      color: isSelected
+                          ? const Color(0xFFB71C1C)
+                          : Colors.brown.shade800,
+                    ),
+                  ),
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    _setSleepTimer(opt.duration);
+                  },
+                );
+              }),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showSpeedSelectorSheet() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        const speeds = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0];
+
+        return Container(
+          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+          decoration: BoxDecoration(
+            color: const Color(0xFFFFF8E7),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+            border: Border.all(color: const Color(0xFFFFCC80), width: 1.5),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.15),
+                blurRadius: 20,
+                offset: const Offset(0, -4),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFCC80),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.speed_rounded, color: Color(0xFFB71C1C), size: 22),
+                  SizedBox(width: 8),
+                  Text(
+                    'Playback Speed',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFFB71C1C),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 18),
+              Wrap(
+                alignment: WrapAlignment.center,
+                spacing: 10,
+                runSpacing: 10,
+                children: speeds.map((s) {
+                  final isSelected = _controller.speed == s;
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.pop(ctx);
+                      _controller.setSpeed(s);
+                    },
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 150),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 18,
+                        vertical: 12,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? const Color(0xFFD32F2F)
+                            : Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: isSelected
+                              ? const Color(0xFFD32F2F)
+                              : const Color(0xFFFFCC80),
+                          width: 1.5,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.orange.withValues(
+                                alpha: isSelected ? 0.22 : 0.06),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Text(
+                        '${s}x',
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          color: isSelected
+                              ? Colors.white
+                              : Colors.brown.shade800,
+                        ),
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: 12),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildBottomUtilityBar() {
+    final speed = _controller.speed;
+    final isSpeedActive = speed != 1.0;
+    final isTimerActive = _sleepTimerRemaining != null;
+    final isLoopActive = _controller.isLooping;
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        // Playback Speed Pill (Tap or Hold to select speed directly)
+        _buildUtilityPill(
+          icon: Icons.speed_rounded,
+          label: '${speed}x',
+          tooltip: 'Hold or tap to select playback speed',
+          isActive: isSpeedActive,
+          onTap: _showSpeedSelectorSheet,
+          onLongPress: _showSpeedSelectorSheet,
+        ),
+        const SizedBox(width: 12),
+
+        // Sleep Timer Pill
+        _buildUtilityPill(
+          icon: isTimerActive
+              ? Icons.bedtime_rounded
+              : Icons.bedtime_outlined,
+          label: isTimerActive
+              ? _formatSleepTimer(_sleepTimerRemaining!)
+              : 'Timer',
+          tooltip: 'Sleep Timer',
+          isActive: isTimerActive,
+          onTap: _showSleepTimerSheet,
+          onLongPress: _showSleepTimerSheet,
+        ),
+        const SizedBox(width: 12),
+
+        // Single Track Loop Pill
+        _buildUtilityPill(
+          icon: Icons.repeat_one_rounded,
+          label: isLoopActive ? 'Loop' : 'Once',
+          tooltip: isLoopActive
+              ? 'Single Track Loop: On'
+              : 'Single Track Loop: Off',
+          isActive: isLoopActive,
+          onTap: () => _controller.toggleLoop(),
+          onLongPress: () => _controller.toggleLoop(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildUtilityPill({
+    required IconData icon,
+    required String label,
+    required String tooltip,
+    required bool isActive,
+    required VoidCallback onTap,
+    VoidCallback? onLongPress,
+  }) {
+    return Tooltip(
+      message: tooltip,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          onLongPress: onLongPress,
+          borderRadius: BorderRadius.circular(18),
+          child: Ink(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: isActive
+                  ? const Color(0xFFD32F2F)
+                  : Colors.white.withValues(alpha: 0.8),
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(
+                color: isActive
+                    ? const Color(0xFFD32F2F)
+                    : const Color(0xFFFFCC80),
+                width: 1,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.orange.withValues(alpha: 0.08),
+                  blurRadius: 6,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  icon,
+                  size: 14,
+                  color: isActive ? Colors.white : const Color(0xFFB71C1C),
+                ),
+                const SizedBox(width: 5),
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w700,
+                    color: isActive ? Colors.white : Colors.brown.shade800,
+                  ),
+                ),
+              ],
             ),
           ),
         ),

@@ -56,7 +56,35 @@ class AudioPlayerController extends ChangeNotifier {
 
   bool get isInitialized => _isInitialized;
   bool get isBusy => _operationInProgress;
-  bool get canRestart => isCompleted;
+  double _speed = 1.0;
+  bool _isLooping = false;
+
+  double get speed => _speed;
+  bool get isLooping => _isLooping;
+
+  /// Sets the playback speed.
+  Future<void> setSpeed(double speed) async {
+    if (!_canOperate || !_isInitialized || hasError) return;
+    try {
+      _speed = speed;
+      await _audioPlayer.setSpeed(speed);
+      notifyListeners();
+    } catch (error, stackTrace) {
+      _handleOperationError('setSpeed', error, stackTrace);
+    }
+  }
+
+  /// Toggles single track looping.
+  Future<void> toggleLoop() async {
+    if (!_canOperate || !_isInitialized || hasError) return;
+    try {
+      _isLooping = !_isLooping;
+      await _audioPlayer.setLoopMode(_isLooping ? LoopMode.one : LoopMode.off);
+      notifyListeners();
+    } catch (error, stackTrace) {
+      _handleOperationError('toggleLoop', error, stackTrace);
+    }
+  }
 
   String? get audioAssetPath => _audioAssetPath;
 
