@@ -90,41 +90,12 @@ class _PlayerScreenState extends State<PlayerScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: Image.asset(
-                      'assets/artwork.png',
-                      height: 220,
-                      width: 220,
-                      fit: BoxFit.contain,
-                    ),
-                  ),
+                  const SizedBox(height: 12),
 
-                  const SizedBox(height: 32),
-
-                  const Text(
-                    'Bhagavad Gita',
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFFD32F2F),
-                      letterSpacing: 1.2,
-                    ),
-                  ),
-
-                  const SizedBox(height: 8),
-
-                  Text(
-                    'Song of the Spirit',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey[700],
-                    ),
-                  ),
-
-                  const SizedBox(height: 40),
-
-                  _CircularSeekControl(
+                  // Unified Divine Chakra Artwork Seeker
+                  _DivineChakraSeekControl(
+                    imagePath: 'assets/artwork.png',
+                    isPlaying: _controller.isPlaying,
                     position: _dragPosition != null
                         ? Duration(milliseconds: _dragPosition!.round())
                         : _controller.position,
@@ -146,12 +117,34 @@ class _PlayerScreenState extends State<PlayerScreen> {
                     },
                   ),
 
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 28),
 
-                  // Slider - always enabled except during loading
+                  const Text(
+                    'Bhagavad Gita',
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFFD32F2F),
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+
+                  const SizedBox(height: 8),
+
+                  Text(
+                    'Song of the Spirit',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey[700],
+                    ),
+                  ),
+
+                  const SizedBox(height: 36),
+
+                  // Horizontal slider - synchronized with circular seeker
                   SliderTheme(
                     data: SliderTheme.of(context).copyWith(
-                      showValueIndicator: ShowValueIndicator.always,
+                      showValueIndicator: ShowValueIndicator.onDrag,
                     ),
                     child: Slider(
                       value: _sliderValue,
@@ -192,21 +185,23 @@ class _PlayerScreenState extends State<PlayerScreen> {
                           _formatDuration(
                             Duration(milliseconds: _sliderValue.round()),
                           ),
+                          style: TextStyle(color: Colors.grey.shade700, fontWeight: FontWeight.w500),
                         ),
                         Text(
                           _formatDuration(
                             _controller.duration,
                           ),
+                          style: TextStyle(color: Colors.grey.shade700, fontWeight: FontWeight.w500),
                         ),
                       ],
                     ),
                   ),
 
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 36),
 
                   _buildPlaybackButton(),
 
-                  const SizedBox(height: 60),
+                  const SizedBox(height: 48),
                 ],
               ),
             ),
@@ -283,13 +278,18 @@ class _PlayerScreenState extends State<PlayerScreen> {
   }
 }
 
-class _CircularSeekControl extends StatefulWidget {
+/// Unified artwork widget with a layered rotating Divine Chakra halo and an outer circumference seeker.
+class _DivineChakraSeekControl extends StatefulWidget {
+  final String imagePath;
+  final bool isPlaying;
   final Duration position;
   final Duration duration;
   final ValueChanged<Duration>? onChanged;
   final ValueChanged<Duration>? onChangeEnd;
 
-  const _CircularSeekControl({
+  const _DivineChakraSeekControl({
+    required this.imagePath,
+    required this.isPlaying,
     required this.position,
     required this.duration,
     this.onChanged,
@@ -297,18 +297,36 @@ class _CircularSeekControl extends StatefulWidget {
   });
 
   @override
-  State<_CircularSeekControl> createState() => _CircularSeekControlState();
+  State<_DivineChakraSeekControl> createState() =>
+      _DivineChakraSeekControlState();
 }
 
-class _CircularSeekControlState extends State<_CircularSeekControl> {
+class _DivineChakraSeekControlState extends State<_DivineChakraSeekControl>
+    with SingleTickerProviderStateMixin {
   double _dragAngle = -1;
-  static const double _size = 150.0;
+  static const double _size = 276.0;
+  late final AnimationController _animController;
+
+  @override
+  void initState() {
+    super.initState();
+    _animController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 12),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _animController.dispose();
+    super.dispose();
+  }
 
   void _updateAngle(Offset localPosition) {
-    final center = const Offset(_size / 2, _size / 2);
+    const center = Offset(_size / 2, _size / 2);
     final dx = localPosition.dx - center.dx;
     final dy = localPosition.dy - center.dy;
-    
+
     var angle = math.atan2(dy, dx) + math.pi / 2;
     if (angle < 0) angle += 2 * math.pi;
 
@@ -317,84 +335,298 @@ class _CircularSeekControlState extends State<_CircularSeekControl> {
     });
 
     if (widget.duration > Duration.zero) {
-      final percent = angle / (2 * math.pi);
+      final percent = (angle / (2 * math.pi)).clamp(0.0, 1.0);
       final dragMillis = widget.duration.inMilliseconds * percent;
       widget.onChanged?.call(Duration(milliseconds: dragMillis.round()));
     }
   }
 
+  void _endDrag() {
+    if (_dragAngle >= 0 && widget.duration > Duration.zero) {
+      final percent = (_dragAngle / (2 * math.pi)).clamp(0.0, 1.0);
+      final dragMillis = widget.duration.inMilliseconds * percent;
+      widget.onChangeEnd?.call(Duration(milliseconds: dragMillis.round()));
+    }
+    setState(() {
+      _dragAngle = -1;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final percent = widget.duration.inMilliseconds > 0
-        ? widget.position.inMilliseconds / widget.duration.inMilliseconds
+        ? (widget.position.inMilliseconds / widget.duration.inMilliseconds)
+            .clamp(0.0, 1.0)
         : 0.0;
 
-    return GestureDetector(
-      onPanDown: (details) => _updateAngle(details.localPosition),
-      onPanUpdate: (details) => _updateAngle(details.localPosition),
-      onPanEnd: (details) {
-        if (_dragAngle >= 0 && widget.duration > Duration.zero) {
-          final percent = _dragAngle / (2 * math.pi);
-          final dragMillis = widget.duration.inMilliseconds * percent;
-          widget.onChangeEnd?.call(Duration(milliseconds: dragMillis.round()));
-        }
-        setState(() {
-          _dragAngle = -1;
-        });
+    final currentProgress = _dragAngle >= 0
+        ? (_dragAngle / (2 * math.pi)).clamp(0.0, 1.0)
+        : percent;
+
+    return AnimatedBuilder(
+      animation: _animController,
+      builder: (context, child) {
+        final animValue = _animController.value;
+        final pulse = widget.isPlaying ? (math.sin(animValue * 2 * math.pi) * 0.5 + 0.5) : 0.0;
+
+        return SizedBox(
+          width: _size,
+          height: _size,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              // 1. Ambient Golden-Saffron Breathing Glow
+              Container(
+                width: 240 + (pulse * 16),
+                height: 240 + (pulse * 16),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFFFFB300).withValues(alpha: 0.22 + (pulse * 0.20)),
+                      blurRadius: 30 + (pulse * 10),
+                      spreadRadius: 4 + (pulse * 6),
+                    ),
+                    BoxShadow(
+                      color: const Color(0xFFD32F2F).withValues(alpha: 0.12 + (pulse * 0.10)),
+                      blurRadius: 40 + (pulse * 8),
+                      spreadRadius: 2,
+                    ),
+                  ],
+                ),
+              ),
+
+              // 2. Centered Circular Artwork
+              Container(
+                width: 184,
+                height: 184,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: const Color(0xFFFFD54F),
+                    width: 3.0,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFFD32F2F).withValues(alpha: 0.25),
+                      blurRadius: 20,
+                      spreadRadius: 2,
+                      offset: const Offset(0, 6),
+                    ),
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.10),
+                      blurRadius: 10,
+                      spreadRadius: 1,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: ClipOval(
+                  child: Image.asset(
+                    widget.imagePath,
+                    width: 184,
+                    height: 184,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+
+              // 3. Layered Rotating Chakra Rays & Outer Circumference Seeker
+              Positioned.fill(
+                child: GestureDetector(
+                  behavior: HitTestBehavior.translucent,
+                  onPanDown: (details) => _updateAngle(details.localPosition),
+                  onPanUpdate: (details) => _updateAngle(details.localPosition),
+                  onPanEnd: (_) => _endDrag(),
+                  onPanCancel: () {
+                    setState(() {
+                      _dragAngle = -1;
+                    });
+                  },
+                  onTapDown: (details) => _updateAngle(details.localPosition),
+                  onTapUp: (_) => _endDrag(),
+                  child: CustomPaint(
+                    size: const Size(_size, _size),
+                    painter: _DivineChakraSeekPainter(
+                      progress: currentProgress,
+                      isDragging: _dragAngle >= 0,
+                      isPlaying: widget.isPlaying,
+                      animValue: animValue,
+                      pulse: pulse,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
       },
-      child: CustomPaint(
-        size: const Size(_size, _size),
-        painter: _CircularSeekPainter(
-          progress: _dragAngle >= 0 ? _dragAngle / (2 * math.pi) : percent,
-        ),
-      ),
     );
   }
 }
 
-class _CircularSeekPainter extends CustomPainter {
+/// Painter rendering concentric layered visuals:
+/// - Dedicated Inner Halo Band: Rotating 16-ray Sudarshana Chakra & golden aura rays.
+/// - Dedicated Outer Orbit: Clear circumference seek track & illuminated jewel thumb.
+class _DivineChakraSeekPainter extends CustomPainter {
   final double progress;
-  _CircularSeekPainter({required this.progress});
+  final bool isDragging;
+  final bool isPlaying;
+  final double animValue;
+  final double pulse;
+
+  _DivineChakraSeekPainter({
+    required this.progress,
+    required this.isDragging,
+    required this.isPlaying,
+    required this.animValue,
+    required this.pulse,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
-    final radius = math.min(size.width, size.height) / 2 - 10;
 
-    final bgPaint = Paint()
-      ..color = Colors.grey.shade300
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 10;
+    // Layer Radii:
+    // Artwork radius = 92.0
+    // Chakra rays inner radius = 98.0, outer radius = 114.0
+    // Seek track radius = 126.0 (Clear outer orbit, never hides the chakra rays)
+    const chakraInnerRadius = 98.0;
+    const chakraOuterRadius = 114.0;
+    final seekRadius = (size.width / 2) - 10.0; // 128.0
 
-    final progressPaint = Paint()
-      ..color = const Color(0xFFD32F2F)
+    // -------------------------------------------------------------
+    // LAYER 1: Rotating Sacred Sudarshana Chakra Halo
+    // -------------------------------------------------------------
+    final rotationAngle = isPlaying ? (animValue * 2 * math.pi) : 0.0;
+
+    // Inner subtle golden boundary ring
+    final innerRingPaint = Paint()
+      ..color = const Color(0xFFFFD54F).withValues(alpha: 0.35 + (pulse * 0.20))
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 10
+      ..strokeWidth = 1.2;
+    canvas.drawCircle(center, chakraInnerRadius, innerRingPaint);
+
+    // Mid boundary ring
+    final midRingPaint = Paint()
+      ..color = const Color(0xFFFFB300).withValues(alpha: 0.25 + (pulse * 0.15))
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.0;
+    canvas.drawCircle(center, chakraOuterRadius, midRingPaint);
+
+    // 16 Sacred Chakra Rays / Spokes
+    final spokePaint = Paint()
+      ..color = const Color(0xFFFF8F00).withValues(alpha: 0.50 + (pulse * 0.30))
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.8
       ..strokeCap = StrokeCap.round;
 
-    canvas.drawCircle(center, radius, bgPaint);
-    canvas.drawArc(
-      Rect.fromCircle(center: center, radius: radius),
-      -math.pi / 2,
-      progress * 2 * math.pi,
-      false,
-      progressPaint,
-    );
+    final rayTipPaint = Paint()
+      ..color = const Color(0xFFD32F2F).withValues(alpha: 0.70 + (pulse * 0.25))
+      ..style = PaintingStyle.fill;
 
-    final thumbAngle = -math.pi / 2 + progress * 2 * math.pi;
-    final thumbOffset = Offset(
-      center.dx + radius * math.cos(thumbAngle),
-      center.dy + radius * math.sin(thumbAngle),
-    );
+    final goldBeadPaint = Paint()
+      ..color = const Color(0xFFFFD54F)
+      ..style = PaintingStyle.fill;
 
-    final thumbPaint = Paint()..color = const Color(0xFFD32F2F);
-    canvas.drawCircle(thumbOffset, 12, thumbPaint);
-    final thumbShadow = Paint()..color = Colors.white;
-    canvas.drawCircle(thumbOffset, 8, thumbShadow);
+    for (int i = 0; i < 16; i++) {
+      final rayAngle = (i * 2 * math.pi / 16) + rotationAngle;
+      final pInner = Offset(
+        center.dx + chakraInnerRadius * math.cos(rayAngle),
+        center.dy + chakraInnerRadius * math.sin(rayAngle),
+      );
+      final pOuter = Offset(
+        center.dx + chakraOuterRadius * math.cos(rayAngle),
+        center.dy + chakraOuterRadius * math.sin(rayAngle),
+      );
+
+      // Draw spoke line
+      canvas.drawLine(pInner, pOuter, spokePaint);
+
+      // Draw decorative tip bead
+      canvas.drawCircle(pOuter, 2.2, rayTipPaint);
+      canvas.drawCircle(pOuter, 1.0, goldBeadPaint);
+    }
+
+    // -------------------------------------------------------------
+    // LAYER 2: Outer Circumference Seek Track (Orbits independently)
+    // -------------------------------------------------------------
+    // Background track ring
+    final trackBgPaint = Paint()
+      ..color = const Color(0xFFFFE082).withValues(alpha: 0.40)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 5.5;
+    canvas.drawCircle(center, seekRadius, trackBgPaint);
+
+    // Subtle micro-ticks along the track (12 cardinal hours)
+    final tickPaint = Paint()
+      ..color = const Color(0xFFFFA000).withValues(alpha: 0.40)
+      ..style = PaintingStyle.fill;
+    for (int i = 0; i < 12; i++) {
+      final tickAngle = (i * 2 * math.pi / 12) - math.pi / 2;
+      final tickPos = Offset(
+        center.dx + seekRadius * math.cos(tickAngle),
+        center.dy + seekRadius * math.sin(tickAngle),
+      );
+      canvas.drawCircle(tickPos, (i % 3 == 0) ? 2.2 : 1.4, tickPaint);
+    }
+
+    // Active Progress Arc
+    if (progress > 0.0) {
+      final sweepAngle = (progress * 2 * math.pi).clamp(0.0, 2 * math.pi);
+      final progressRect = Rect.fromCircle(center: center, radius: seekRadius);
+
+      final progressPaint = Paint()
+        ..shader = const SweepGradient(
+          startAngle: -math.pi / 2,
+          endAngle: 3 * math.pi / 2,
+          colors: [
+            Color(0xFFFFD54F),
+            Color(0xFFFF7043),
+            Color(0xFFD32F2F),
+          ],
+          stops: [0.0, 0.50, 1.0],
+          transform: GradientRotation(-math.pi / 2),
+        ).createShader(progressRect)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = isDragging ? 8.0 : 6.5
+        ..strokeCap = StrokeCap.round;
+
+      canvas.drawArc(progressRect, -math.pi / 2, sweepAngle, false, progressPaint);
+
+      // Illuminated Glowing Jewel Thumb
+      final thumbAngle = -math.pi / 2 + sweepAngle;
+      final thumbOffset = Offset(
+        center.dx + seekRadius * math.cos(thumbAngle),
+        center.dy + seekRadius * math.sin(thumbAngle),
+      );
+
+      // Thumb Outer Halo Glow
+      final glowPaint = Paint()
+        ..color = const Color(0xFFFFB300).withValues(alpha: 0.60 + (pulse * 0.25))
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6);
+      canvas.drawCircle(thumbOffset, isDragging ? 15 : 12, glowPaint);
+
+      // Outer Gold Rim
+      final outerRingPaint = Paint()..color = const Color(0xFFFFD54F);
+      canvas.drawCircle(thumbOffset, isDragging ? 10.5 : 9.0, outerRingPaint);
+
+      // Inner Crimson Ruby Core
+      final rubyCorePaint = Paint()..color = const Color(0xFFD32F2F);
+      canvas.drawCircle(thumbOffset, isDragging ? 7.0 : 5.5, rubyCorePaint);
+
+      // Center White Sparkle
+      final centerShinePaint = Paint()..color = Colors.white;
+      canvas.drawCircle(thumbOffset + const Offset(-1.2, -1.2), 2.0, centerShinePaint);
+    }
   }
 
   @override
-  bool shouldRepaint(covariant _CircularSeekPainter oldDelegate) {
-    return oldDelegate.progress != progress;
+  bool shouldRepaint(covariant _DivineChakraSeekPainter oldDelegate) {
+    return oldDelegate.progress != progress ||
+        oldDelegate.isDragging != isDragging ||
+        oldDelegate.isPlaying != isPlaying ||
+        oldDelegate.animValue != animValue ||
+        oldDelegate.pulse != pulse;
   }
 }
