@@ -197,11 +197,11 @@ class _PlayerScreenState extends State<PlayerScreen> {
                     ),
                   ),
 
-                  const SizedBox(height: 36),
+                  const SizedBox(height: 28),
 
-                  _buildPlaybackButton(),
+                  _buildPlaybackControls(),
 
-                  const SizedBox(height: 48),
+                  const SizedBox(height: 40),
                 ],
               ),
             ),
@@ -211,68 +211,300 @@ class _PlayerScreenState extends State<PlayerScreen> {
     );
   }
 
-  Widget _buildPlaybackButton() {
+  int _selectedIntervalIndex = 1; // Default to 30s
+
+  static const List<({String label, int seconds})> _jumpIntervals = [
+    (label: '10s', seconds: 10),
+    (label: '30s', seconds: 30),
+    (label: '1m', seconds: 60),
+    (label: '5m', seconds: 300),
+    (label: '10m', seconds: 600),
+  ];
+
+  ({String label, int seconds}) get _currentInterval =>
+      _jumpIntervals[_selectedIntervalIndex];
+
+  void _jump(int seconds) {
+    if (!_controller.isInitialized || _controller.isLoading) return;
+    final currentMs = _controller.position.inMilliseconds;
+    final totalMs = _controller.duration.inMilliseconds;
+    if (totalMs <= 0) return;
+
+    final targetMs = (currentMs + (seconds * 1000)).clamp(0, totalMs);
+    _controller.seek(Duration(milliseconds: targetMs));
+  }
+
+  Widget _buildPlaybackControls() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // Micro interval selector for 73-minute single track navigation
+        _buildIntervalSelector(),
+
+        const SizedBox(height: 22),
+
+        // Symmetrical Controls Row: [ -Skip ]  [ Play/Pause ]  [ +Skip ]
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _buildSkipButton(
+              icon: Icons.replay_rounded,
+              label: '-${_currentInterval.label}',
+              tooltip: 'Rewind ${_currentInterval.label}',
+              onPressed: _controller.isInitialized && !_controller.isLoading
+                  ? () => _jump(-_currentInterval.seconds)
+                  : null,
+            ),
+            const SizedBox(width: 24),
+            _buildCenterActionButton(),
+            const SizedBox(width: 24),
+            _buildSkipButton(
+              icon: Icons.forward_rounded,
+              label: '+${_currentInterval.label}',
+              tooltip: 'Forward ${_currentInterval.label}',
+              onPressed: _controller.isInitialized && !_controller.isLoading
+                  ? () => _jump(_currentInterval.seconds)
+                  : null,
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildIntervalSelector() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.85),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: const Color(0xFFFFCC80),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.orange.withValues(alpha: 0.08),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: List.generate(_jumpIntervals.length, (index) {
+          final option = _jumpIntervals[index];
+          final isSelected = index == _selectedIntervalIndex;
+          return GestureDetector(
+            onTap: () {
+              setState(() {
+                _selectedIntervalIndex = index;
+              });
+            },
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
+              decoration: BoxDecoration(
+                color: isSelected ? const Color(0xFFD32F2F) : Colors.transparent,
+                borderRadius: BorderRadius.circular(18),
+                boxShadow: isSelected
+                    ? [
+                        BoxShadow(
+                          color: const Color(0xFFD32F2F).withValues(alpha: 0.3),
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
+                        ),
+                      ]
+                    : null,
+              ),
+              child: Text(
+                option.label,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                  color: isSelected ? Colors.white : Colors.grey.shade700,
+                ),
+              ),
+            ),
+          );
+        }),
+      ),
+    );
+  }
+
+  Widget _buildSkipButton({
+    required IconData icon,
+    required String label,
+    required String tooltip,
+    required VoidCallback? onPressed,
+  }) {
+    final isEnabled = onPressed != null;
+    return Tooltip(
+      message: tooltip,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onPressed,
+          borderRadius: BorderRadius.circular(28),
+          splashColor: const Color(0xFFFFCC80).withValues(alpha: 0.4),
+          child: Ink(
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.white,
+              border: Border.all(
+                color: isEnabled
+                    ? const Color(0xFFFFB74D)
+                    : Colors.grey.shade300,
+                width: 1.5,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.orange.withValues(alpha: isEnabled ? 0.12 : 0.04),
+                  blurRadius: 8,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  icon,
+                  size: 22,
+                  color: isEnabled
+                      ? const Color(0xFFD32F2F)
+                      : Colors.grey.shade400,
+                ),
+                const SizedBox(height: 1),
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    color: isEnabled
+                        ? const Color(0xFFD32F2F)
+                        : Colors.grey.shade400,
+                    letterSpacing: -0.2,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCenterActionButton() {
     if (_controller.isLoading) {
-      return const SizedBox(
-        width: 180,
-        height: 60,
-        child: Center(
-          child: CircularProgressIndicator(),
+      return Container(
+        width: 72,
+        height: 72,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.orange.withValues(alpha: 0.2),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: const Center(
+          child: SizedBox(
+            width: 32,
+            height: 32,
+            child: CircularProgressIndicator(
+              strokeWidth: 3,
+              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFD32F2F)),
+            ),
+          ),
         ),
       );
     }
 
     if (_controller.hasError) {
-      return ElevatedButton.icon(
-        onPressed: () async {
-          await _controller.tryRecover();
-        },
-        icon: const Icon(
-          Icons.refresh_rounded,
-          size: 24,
-        ),
-        label: const Text('Retry'),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.orange.shade300,
-          foregroundColor: Colors.white,
-          minimumSize: const Size(180, 60),
+      return Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () async {
+            await _controller.tryRecover();
+          },
+          borderRadius: BorderRadius.circular(36),
+          child: Ink(
+            width: 72,
+            height: 72,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: const LinearGradient(
+                colors: [Color(0xFFFF7043), Color(0xFFD32F2F)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFFD32F2F).withValues(alpha: 0.35),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: const Icon(
+              Icons.refresh_rounded,
+              color: Colors.white,
+              size: 34,
+            ),
+          ),
         ),
       );
     }
 
-    String label = 'Play';
     IconData icon = Icons.play_arrow_rounded;
 
     if (_controller.isPlaying) {
-      label = 'Pause';
       icon = Icons.pause_rounded;
     } else if (_controller.isCompleted) {
-      label = 'Replay';
       icon = Icons.replay_rounded;
-    } else if (_controller.position > Duration.zero) {
-      label = 'Resume';
     }
 
-    return ElevatedButton.icon(
-      onPressed: () {
-        if (_controller.isCompleted) {
-          _controller.restart();
-        } else {
-          _controller.togglePlayPause();
-        }
-      },
-      icon: Icon(
-        icon,
-        size: 36,
-      ),
-      label: Text(
-        label,
-        style: const TextStyle(
-          fontSize: 18,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          if (_controller.isCompleted) {
+            _controller.restart();
+          } else {
+            _controller.togglePlayPause();
+          }
+        },
+        borderRadius: BorderRadius.circular(36),
+        child: Ink(
+          width: 72,
+          height: 72,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: const LinearGradient(
+              colors: [Color(0xFFE53935), Color(0xFFC62828)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFFD32F2F).withValues(alpha: 0.4),
+                blurRadius: 14,
+                offset: const Offset(0, 5),
+              ),
+            ],
+          ),
+          child: Icon(
+            icon,
+            size: 42,
+            color: Colors.white,
+          ),
         ),
-      ),
-      style: ElevatedButton.styleFrom(
-        minimumSize: const Size(180, 60),
       ),
     );
   }
