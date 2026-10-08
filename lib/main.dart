@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:audio_session/audio_session.dart';
@@ -10,24 +11,26 @@ import 'package:bhagavad_gita/services/audio_player_controller.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Lock orientation strictly to portrait
-  await SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown,
-  ]);
+  if (!kIsWeb) {
+    // Lock orientation strictly to portrait on mobile devices
+    await SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
 
-  // Initialize just_audio_background for media notification and session support.
-  // This must be called before runApp() to properly set up the media session.
-  await JustAudioBackground.init(
-    androidNotificationChannelId: 'com.reshapel.bhagavadgita.channel.audio',
-    androidNotificationChannelName: 'Bhagavad Gita Playback',
-    androidNotificationOngoing: true,
-    androidNotificationIcon: 'mipmap/ic_launcher',
-  );
-  // Configure audio session for media playback, audio focus handling,
-  // and interruption / headphone disconnect handling.
-  final session = await AudioSession.instance;
-  await session.configure(const AudioSessionConfiguration.music());
+    // Initialize just_audio_background for media notification and session support.
+    await JustAudioBackground.init(
+      androidNotificationChannelId: 'com.reshapel.bhagavadgita.channel.audio',
+      androidNotificationChannelName: 'Bhagavad Gita Playback',
+      androidNotificationOngoing: true,
+      androidNotificationIcon: 'mipmap/ic_launcher',
+    );
+    // Configure audio session for media playback, audio focus handling,
+    // and interruption / headphone disconnect handling.
+    final session = await AudioSession.instance;
+    await session.configure(const AudioSessionConfiguration.music());
+  }
+
   runApp(const BhagavadGitaApp());
 }
 
@@ -70,6 +73,40 @@ class BhagavadGitaApp extends StatelessWidget {
           trackHeight: 6,
         ),
       ),
+      builder: (context, child) {
+        if (kIsWeb) {
+          final isWide = MediaQuery.of(context).size.width > 540;
+          if (isWide) {
+            return Scaffold(
+              backgroundColor: const Color(0xFF2C0B0E),
+              body: Center(
+                child: Container(
+                  constraints: const BoxConstraints(
+                    maxWidth: 440,
+                    maxHeight: 880,
+                  ),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(28),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.5),
+                        blurRadius: 36,
+                        spreadRadius: 6,
+                        offset: const Offset(0, 12),
+                      ),
+                    ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(28),
+                    child: child ?? const SizedBox.shrink(),
+                  ),
+                ),
+              ),
+            );
+          }
+        }
+        return child ?? const SizedBox.shrink();
+      },
       home: Builder(
         builder: (context) => SplashScreen(
           onSplashComplete: () {

@@ -134,9 +134,11 @@ class AudioPlayerController extends ChangeNotifier {
 
       _audioAssetPath = audioAssetPath;
 
-      // Configure audio session for media playback, focus, and interruptions.
-      final session = await AudioSession.instance;
-      await session.configure(const AudioSessionConfiguration.music());
+      if (!kIsWeb) {
+        // Configure audio session for media playback, focus, and interruptions.
+        final session = await AudioSession.instance;
+        await session.configure(const AudioSessionConfiguration.music());
+      }
 
       // Use setAsset() — the correct API for Flutter bundled assets.
       // The tag: MediaItem is required by just_audio_background for media
