@@ -22,6 +22,7 @@ void main() async {
     androidNotificationChannelId: 'com.reshapel.bhagavadgita.channel.audio',
     androidNotificationChannelName: 'Bhagavad Gita Playback',
     androidNotificationOngoing: true,
+    androidNotificationIcon: 'mipmap/ic_launcher',
   );
   // Configure audio session for media playback, audio focus handling,
   // and interruption / headphone disconnect handling.
