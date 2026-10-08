@@ -70,9 +70,12 @@ class _PlayerScreenState extends State<PlayerScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isLandscape =
+        MediaQuery.of(context).orientation == Orientation.landscape;
+
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(56),
+        preferredSize: Size.fromHeight(isLandscape ? 44 : 56),
         child: Container(
           decoration: BoxDecoration(
             gradient: const LinearGradient(
@@ -98,16 +101,16 @@ class _PlayerScreenState extends State<PlayerScreen> {
               ),
             ),
           ),
-          child: const SafeArea(
+          child: SafeArea(
             child: Center(
               child: Text(
                 'Bhagavad Gita',
                 style: TextStyle(
-                  fontSize: 20,
+                  fontSize: isLandscape ? 17 : 20,
                   fontWeight: FontWeight.w800,
                   color: Colors.white,
                   letterSpacing: 1.2,
-                  shadows: [
+                  shadows: const [
                     Shadow(
                       color: Colors.black38,
                       blurRadius: 6,
@@ -135,175 +138,263 @@ class _PlayerScreenState extends State<PlayerScreen> {
           ),
         ),
         child: SafeArea(
-          child: Padding(
+          child: isLandscape
+              ? _buildLandscapeLayout()
+              : _buildPortraitLayout(),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPortraitLayout() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 20,
+        vertical: 8,
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          // 1. Unified Divine Chakra Artwork Seeker
+          _DivineChakraSeekControl(
+            size: 260,
+            imagePath: 'assets/artwork.png',
+            isPlaying: _controller.isPlaying,
+            position: _dragPosition != null
+                ? Duration(milliseconds: _dragPosition!.round())
+                : _controller.position,
+            duration: _controller.duration,
+            onChanged: (duration) {
+              if (_controller.isInitialized && !_controller.isLoading) {
+                setState(() {
+                  _dragPosition = duration.inMilliseconds.toDouble();
+                });
+              }
+            },
+            onChangeEnd: (duration) {
+              if (_controller.isInitialized && !_controller.isLoading) {
+                _controller.seek(duration);
+                setState(() {
+                  _dragPosition = null;
+                });
+              }
+            },
+          ),
+
+          // 2. Horizontal seek slider & synchronized time indicators
+          _buildSliderSection(),
+
+          // 3. Devotional Media Controls Console Card
+          Container(
             padding: const EdgeInsets.symmetric(
-              horizontal: 20,
-              vertical: 10,
+              horizontal: 14,
+              vertical: 14,
             ),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.75),
+              borderRadius: BorderRadius.circular(28),
+              border: Border.all(
+                color: const Color(0xFFFFE082),
+                width: 1.2,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.orange.withValues(alpha: 0.10),
+                  blurRadius: 16,
+                  offset: const Offset(0, 5),
+                ),
+              ],
+            ),
+            child: _buildPlaybackControls(),
+          ),
+
+          // 4. Dedicated Devotional Utility Toolbar (Speed, Timer, Loop)
+          _buildBottomUtilityBar(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLandscapeLayout() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          // Left: Scaled Divine Chakra Artwork Seeker
+          Expanded(
+            flex: 4,
+            child: Center(
+              child: _DivineChakraSeekControl(
+                size: 190,
+                imagePath: 'assets/artwork.png',
+                isPlaying: _controller.isPlaying,
+                position: _dragPosition != null
+                    ? Duration(milliseconds: _dragPosition!.round())
+                    : _controller.position,
+                duration: _controller.duration,
+                onChanged: (duration) {
+                  if (_controller.isInitialized && !_controller.isLoading) {
+                    setState(() {
+                      _dragPosition = duration.inMilliseconds.toDouble();
+                    });
+                  }
+                },
+                onChangeEnd: (duration) {
+                  if (_controller.isInitialized && !_controller.isLoading) {
+                    _controller.seek(duration);
+                    setState(() {
+                      _dragPosition = null;
+                    });
+                  }
+                },
+              ),
+            ),
+          ),
+
+          const SizedBox(width: 16),
+
+          // Right: Seek slider + Controls + Utility Toolbar
+          Expanded(
+            flex: 6,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                // 1. Unified Divine Chakra Artwork Seeker
-                _DivineChakraSeekControl(
-                  imagePath: 'assets/artwork.png',
-                  isPlaying: _controller.isPlaying,
-                  position: _dragPosition != null
-                      ? Duration(milliseconds: _dragPosition!.round())
-                      : _controller.position,
-                  duration: _controller.duration,
-                  onChanged: (duration) {
-                    if (_controller.isInitialized && !_controller.isLoading) {
-                      setState(() {
-                        _dragPosition = duration.inMilliseconds.toDouble();
-                      });
-                    }
-                  },
-                  onChangeEnd: (duration) {
-                    if (_controller.isInitialized && !_controller.isLoading) {
-                      _controller.seek(duration);
-                      setState(() {
-                        _dragPosition = null;
-                      });
-                    }
-                  },
-                ),
-
-                // 2. Horizontal seek slider & synchronized time indicators
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SliderTheme(
-                      data: SliderTheme.of(context).copyWith(
-                        trackHeight: 5,
-                        activeTrackColor: const Color(0xFFD32F2F),
-                        inactiveTrackColor: const Color(0xFFFFCC80),
-                        thumbColor: const Color(0xFFD32F2F),
-                        overlayColor: const Color(0xFFD32F2F).withValues(alpha: 0.15),
-                        thumbShape: const RoundSliderThumbShape(
-                          enabledThumbRadius: 7.5,
-                          elevation: 3,
-                        ),
-                        showValueIndicator: ShowValueIndicator.onDrag,
-                      ),
-                      child: Slider(
-                        value: _sliderValue,
-                        min: 0,
-                        max: _controller.duration > Duration.zero
-                            ? _controller.duration.inMilliseconds.toDouble()
-                            : 1,
-                        label: _formatDuration(
-                            Duration(milliseconds: _sliderValue.round())),
-                        onChanged: _controller.isInitialized && !_controller.isLoading
-                            ? (value) {
-                                setState(() {
-                                  _dragPosition = value;
-                                });
-                              }
-                            : null,
-                        onChangeEnd: _controller.isInitialized && !_controller.isLoading
-                            ? (value) {
-                                _controller.seek(
-                                  Duration(milliseconds: value.round()),
-                                );
-                                setState(() {
-                                  _dragPosition = null;
-                                });
-                              }
-                            : null,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 3,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.85),
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(
-                                color: const Color(0xFFFFE0B2),
-                                width: 1,
-                              ),
-                            ),
-                            child: Text(
-                              _formatDuration(
-                                Duration(milliseconds: _sliderValue.round()),
-                              ),
-                              style: const TextStyle(
-                                fontSize: 12,
-                                color: Color(0xFFB71C1C),
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 3,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.85),
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(
-                                color: const Color(0xFFFFE0B2),
-                                width: 1,
-                              ),
-                            ),
-                            child: Text(
-                              _formatDuration(
-                                _controller.duration,
-                              ),
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.brown.shade700,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-
-                // 3. Devotional Media Controls Console Card
+                _buildSliderSection(),
                 Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 16,
+                    horizontal: 12,
+                    vertical: 8,
                   ),
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.75),
-                    borderRadius: BorderRadius.circular(28),
+                    borderRadius: BorderRadius.circular(22),
                     border: Border.all(
                       color: const Color(0xFFFFE082),
                       width: 1.2,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.orange.withValues(alpha: 0.10),
-                        blurRadius: 16,
-                        offset: const Offset(0, 5),
+                        color: Colors.orange.withValues(alpha: 0.08),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
                       ),
                     ],
                   ),
                   child: _buildPlaybackControls(),
                 ),
-
-                // 4. Dedicated Devotional Utility Toolbar (Speed, Timer, Loop)
                 _buildBottomUtilityBar(),
               ],
             ),
           ),
-        ),
+        ],
       ),
+    );
+  }
+
+  Widget _buildSliderSection() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SliderTheme(
+          data: SliderTheme.of(context).copyWith(
+            trackHeight: 5,
+            activeTrackColor: const Color(0xFFD32F2F),
+            inactiveTrackColor: const Color(0xFFFFCC80),
+            thumbColor: const Color(0xFFD32F2F),
+            overlayColor: const Color(0xFFD32F2F).withValues(alpha: 0.15),
+            thumbShape: const RoundSliderThumbShape(
+              enabledThumbRadius: 7.5,
+              elevation: 3,
+            ),
+            showValueIndicator: ShowValueIndicator.onDrag,
+          ),
+          child: Slider(
+            value: _sliderValue,
+            min: 0,
+            max: _controller.duration > Duration.zero
+                ? _controller.duration.inMilliseconds.toDouble()
+                : 1,
+            label: _formatDuration(
+                Duration(milliseconds: _sliderValue.round())),
+            onChanged: _controller.isInitialized && !_controller.isLoading
+                ? (value) {
+                    setState(() {
+                      _dragPosition = value;
+                    });
+                  }
+                : null,
+            onChangeEnd: _controller.isInitialized && !_controller.isLoading
+                ? (value) {
+                    _controller.seek(
+                      Duration(milliseconds: value.round()),
+                    );
+                    setState(() {
+                      _dragPosition = null;
+                    });
+                  }
+                : null,
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 14,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8,
+                  vertical: 3,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.85),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: const Color(0xFFFFE0B2),
+                    width: 1,
+                  ),
+                ),
+                child: Text(
+                  _formatDuration(
+                    Duration(milliseconds: _sliderValue.round()),
+                  ),
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Color(0xFFB71C1C),
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8,
+                  vertical: 3,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.85),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: const Color(0xFFFFE0B2),
+                    width: 1,
+                  ),
+                ),
+                child: Text(
+                  _formatDuration(
+                    _controller.duration,
+                  ),
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.brown.shade700,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
@@ -1156,7 +1247,9 @@ class _DialNotchPainter extends CustomPainter {
 }
 
 /// Unified artwork widget with a layered rotating Divine Chakra halo and an outer circumference seeker.
+/// Unified artwork widget with a layered rotating Divine Chakra halo and an outer circumference seeker.
 class _DivineChakraSeekControl extends StatefulWidget {
+  final double size;
   final String imagePath;
   final bool isPlaying;
   final Duration position;
@@ -1165,6 +1258,7 @@ class _DivineChakraSeekControl extends StatefulWidget {
   final ValueChanged<Duration>? onChangeEnd;
 
   const _DivineChakraSeekControl({
+    this.size = 270.0,
     required this.imagePath,
     required this.isPlaying,
     required this.position,
@@ -1181,7 +1275,6 @@ class _DivineChakraSeekControl extends StatefulWidget {
 class _DivineChakraSeekControlState extends State<_DivineChakraSeekControl>
     with SingleTickerProviderStateMixin {
   double _dragAngle = -1;
-  static const double _size = 276.0;
   late final AnimationController _animController;
 
   @override
@@ -1200,7 +1293,7 @@ class _DivineChakraSeekControlState extends State<_DivineChakraSeekControl>
   }
 
   void _updateAngle(Offset localPosition) {
-    const center = Offset(_size / 2, _size / 2);
+    final center = Offset(widget.size / 2, widget.size / 2);
     final dx = localPosition.dx - center.dx;
     final dy = localPosition.dy - center.dy;
 
@@ -1240,33 +1333,40 @@ class _DivineChakraSeekControlState extends State<_DivineChakraSeekControl>
         ? (_dragAngle / (2 * math.pi)).clamp(0.0, 1.0)
         : percent;
 
+    final artDimension = widget.size * 0.66;
+    final glowDimension = widget.size * 0.88;
+
     return AnimatedBuilder(
       animation: _animController,
       builder: (context, child) {
         final animValue = _animController.value;
-        final pulse = widget.isPlaying ? (math.sin(animValue * 2 * math.pi) * 0.5 + 0.5) : 0.0;
+        final pulse = widget.isPlaying
+            ? (math.sin(animValue * 2 * math.pi) * 0.5 + 0.5)
+            : 0.0;
 
         return SizedBox(
-          width: _size,
-          height: _size,
+          width: widget.size,
+          height: widget.size,
           child: Stack(
             alignment: Alignment.center,
             children: [
               // 1. Ambient Golden-Saffron Breathing Glow
               Container(
-                width: 240 + (pulse * 16),
-                height: 240 + (pulse * 16),
+                width: glowDimension + (pulse * (widget.size * 0.06)),
+                height: glowDimension + (pulse * (widget.size * 0.06)),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFFFFB300).withValues(alpha: 0.22 + (pulse * 0.20)),
-                      blurRadius: 30 + (pulse * 10),
-                      spreadRadius: 4 + (pulse * 6),
+                      color: const Color(0xFFFFB300)
+                          .withValues(alpha: 0.22 + (pulse * 0.20)),
+                      blurRadius: (widget.size * 0.11) + (pulse * 10),
+                      spreadRadius: 3 + (pulse * 5),
                     ),
                     BoxShadow(
-                      color: const Color(0xFFD32F2F).withValues(alpha: 0.12 + (pulse * 0.10)),
-                      blurRadius: 40 + (pulse * 8),
+                      color: const Color(0xFFD32F2F)
+                          .withValues(alpha: 0.12 + (pulse * 0.10)),
+                      blurRadius: (widget.size * 0.15) + (pulse * 8),
                       spreadRadius: 2,
                     ),
                   ],
@@ -1275,34 +1375,34 @@ class _DivineChakraSeekControlState extends State<_DivineChakraSeekControl>
 
               // 2. Centered Circular Artwork
               Container(
-                width: 184,
-                height: 184,
+                width: artDimension,
+                height: artDimension,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
                     color: const Color(0xFFFFD54F),
-                    width: 3.0,
+                    width: (widget.size * 0.011).clamp(2.0, 3.5),
                   ),
                   boxShadow: [
                     BoxShadow(
                       color: const Color(0xFFD32F2F).withValues(alpha: 0.25),
-                      blurRadius: 20,
+                      blurRadius: 18,
                       spreadRadius: 2,
-                      offset: const Offset(0, 6),
+                      offset: const Offset(0, 5),
                     ),
                     BoxShadow(
                       color: Colors.black.withValues(alpha: 0.10),
-                      blurRadius: 10,
+                      blurRadius: 8,
                       spreadRadius: 1,
-                      offset: const Offset(0, 3),
+                      offset: const Offset(0, 2),
                     ),
                   ],
                 ),
                 child: ClipOval(
                   child: Image.asset(
                     widget.imagePath,
-                    width: 184,
-                    height: 184,
+                    width: artDimension,
+                    height: artDimension,
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -1323,7 +1423,7 @@ class _DivineChakraSeekControlState extends State<_DivineChakraSeekControl>
                   onTapDown: (details) => _updateAngle(details.localPosition),
                   onTapUp: (_) => _endDrag(),
                   child: CustomPaint(
-                    size: const Size(_size, _size),
+                    size: Size(widget.size, widget.size),
                     painter: _DivineChakraSeekPainter(
                       progress: currentProgress,
                       isDragging: _dragAngle >= 0,
@@ -1364,13 +1464,10 @@ class _DivineChakraSeekPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
 
-    // Layer Radii:
-    // Artwork radius = 92.0
-    // Chakra rays inner radius = 98.0, outer radius = 114.0
-    // Seek track radius = 126.0 (Clear outer orbit, never hides the chakra rays)
-    const chakraInnerRadius = 98.0;
-    const chakraOuterRadius = 114.0;
-    final seekRadius = (size.width / 2) - 10.0; // 128.0
+    // Dynamic Layer Radii proportional to container width:
+    final chakraInnerRadius = (size.width / 2) * 0.71;
+    final chakraOuterRadius = (size.width / 2) * 0.83;
+    final seekRadius = (size.width / 2) * 0.93;
 
     // -------------------------------------------------------------
     // LAYER 1: Rotating Sacred Sudarshana Chakra Halo
