@@ -106,10 +106,6 @@ class AudioPlayerController extends ChangeNotifier {
 
       _audioAssetPath = audioAssetPath;
 
-      // Clear any stale asset cache from previous bad runs before loading.
-      // This is safe to call even on a clean install.
-      await AudioPlayer.clearAssetCache();
-
       // Configure audio session for media playback, focus, and interruptions.
       final session = await AudioSession.instance;
       await session.configure(const AudioSessionConfiguration.music());
@@ -168,7 +164,7 @@ class AudioPlayerController extends ChangeNotifier {
   ///
   /// If the track has completed, playback starts again from the beginning.
   Future<void> play() async {
-    if (!_canOperate || _operationInProgress) {
+    if (!_canOperate) {
       return;
     }
 
@@ -181,8 +177,6 @@ class AudioPlayerController extends ChangeNotifier {
     if (isPlaying) {
       return;
     }
-
-    _operationInProgress = true;
 
     try {
       // If completed, restart from beginning
@@ -203,14 +197,12 @@ class AudioPlayerController extends ChangeNotifier {
       _setState(AudioPlaybackState.playing);
     } catch (error, stackTrace) {
       _handleOperationError('play', error, stackTrace);
-    } finally {
-      _operationInProgress = false;
     }
   }
 
   /// Pauses playback.
   Future<void> pause() async {
-    if (!_canOperate || _operationInProgress) {
+    if (!_canOperate) {
       return;
     }
 
@@ -218,8 +210,6 @@ class AudioPlayerController extends ChangeNotifier {
     if (!_isInitialized || hasError || !isPlaying) {
       return;
     }
-
-    _operationInProgress = true;
 
     try {
       await _audioPlayer.pause();
@@ -231,8 +221,6 @@ class AudioPlayerController extends ChangeNotifier {
       _setState(AudioPlaybackState.paused);
     } catch (error, stackTrace) {
       _handleOperationError('pause', error, stackTrace);
-    } finally {
-      _operationInProgress = false;
     }
   }
 
@@ -250,7 +238,7 @@ class AudioPlayerController extends ChangeNotifier {
   /// The requested value is automatically clamped between zero
   /// and the known track duration.
   Future<void> seek(Duration requestedPosition) async {
-    if (!_canOperate || _operationInProgress) {
+    if (!_canOperate) {
       return;
     }
 
@@ -265,8 +253,6 @@ class AudioPlayerController extends ChangeNotifier {
     }
 
     final target = _clampPosition(requestedPosition);
-
-    _operationInProgress = true;
 
     try {
       await _audioPlayer.seek(target);
@@ -285,8 +271,6 @@ class AudioPlayerController extends ChangeNotifier {
       }
     } catch (error, stackTrace) {
       _handleOperationError('seek', error, stackTrace);
-    } finally {
-      _operationInProgress = false;
     }
   }
 
@@ -294,7 +278,7 @@ class AudioPlayerController extends ChangeNotifier {
   ///
   /// This is useful when the track has completed and the user wants to replay.
   Future<void> restart() async {
-    if (!_canOperate || _operationInProgress) {
+    if (!_canOperate) {
       return;
     }
 
@@ -302,8 +286,6 @@ class AudioPlayerController extends ChangeNotifier {
     if (!_isInitialized || hasError || !isCompleted) {
       return;
     }
-
-    _operationInProgress = true;
 
     try {
       await _audioPlayer.seek(Duration.zero);
@@ -323,14 +305,12 @@ class AudioPlayerController extends ChangeNotifier {
       _setState(AudioPlaybackState.playing);
     } catch (error, stackTrace) {
       _handleOperationError('restart', error, stackTrace);
-    } finally {
-      _operationInProgress = false;
     }
   }
 
   /// Stops playback and resets the position.
   Future<void> stop() async {
-    if (!_canOperate || _operationInProgress) {
+    if (!_canOperate) {
       return;
     }
 
@@ -338,8 +318,6 @@ class AudioPlayerController extends ChangeNotifier {
     if (!_isInitialized || hasError) {
       return;
     }
-
-    _operationInProgress = true;
 
     try {
       await _audioPlayer.stop();
@@ -352,8 +330,6 @@ class AudioPlayerController extends ChangeNotifier {
       _setState(AudioPlaybackState.paused);
     } catch (error, stackTrace) {
       _handleOperationError('stop', error, stackTrace);
-    } finally {
-      _operationInProgress = false;
     }
   }
 

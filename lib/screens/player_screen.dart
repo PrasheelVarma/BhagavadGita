@@ -259,15 +259,13 @@ class _PlayerScreenState extends State<PlayerScreen> {
     }
 
     return ElevatedButton.icon(
-      onPressed: _controller.isBusy
-          ? null
-          : () {
-              if (_controller.isCompleted) {
-                _controller.restart();
-              } else {
-                _controller.togglePlayPause();
-              }
-            },
+      onPressed: () {
+        if (_controller.isCompleted) {
+          _controller.restart();
+        } else {
+          _controller.togglePlayPause();
+        }
+      },
       icon: Icon(
         icon,
         size: 36,
