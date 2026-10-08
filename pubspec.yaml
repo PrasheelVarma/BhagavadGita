@@ -27,15 +27,15 @@ dev_dependencies:
 flutter_launcher_icons:
   android: "launcher_icon"
   ios: false
-  image_path: "assets/logo.png"
+  image_path: "assets/artwork.png"
   min_sdk_android: 21
 
 # 2. Native Splash Screen Configuration
 flutter_native_splash:
   color: "#FFFFFF" # Background color of the splash
-  image: "assets/logo.png" # The logo to show immediately
+  image: "assets/splash.png" # The logo to show immediately
   android_12:
-    image: "assets/logo.png"
+    image: "assets/splash.png"
     icon_background_color: "#FFFFFF"
 
 flutter:

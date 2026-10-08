@@ -56,13 +56,8 @@ class _PlayerScreenState extends State<PlayerScreen> {
       return 0;
     }
 
-    final value =
-        _controller.position.inMilliseconds.toDouble();
     final value = _controller.position.inMilliseconds.toDouble();
     final max = _controller.duration.inMilliseconds.toDouble();
-
-    final max =
-        _controller.duration.inMilliseconds.toDouble();
 
     return value.clamp(0.0, max);
   }
@@ -98,15 +93,13 @@ class _PlayerScreenState extends State<PlayerScreen> {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(20),
                     child: Image.asset(
-                      'assets/logo.png',
+                      'assets/artwork.png',
                       height: 220,
                       width: 220,
-                      fit: BoxFit.cover,
                       fit: BoxFit.contain,
                     ),
                   ),
 
-                  const SizedBox(height: 40),
                   const SizedBox(height: 32),
 
                   const Text(
@@ -129,7 +122,6 @@ class _PlayerScreenState extends State<PlayerScreen> {
                     ),
                   ),
 
-                  const SizedBox(height: 48),
                   const SizedBox(height: 40),
 
                   _CircularSeekControl(
@@ -157,31 +149,6 @@ class _PlayerScreenState extends State<PlayerScreen> {
                   const SizedBox(height: 40),
 
                   // Slider - always enabled except during loading
-                  Slider(
-                    value: _sliderValue,
-                    min: 0,
-                    max: _controller.duration > Duration.zero
-                        ? _controller.duration.inMilliseconds
-                            .toDouble()
-                        : 1,
-                    onChanged: _controller.isInitialized &&
-                            !_controller.isLoading
-                        ? (value) {
-                            setState(() {
-                              // Visual slider update while dragging.
-                            });
-                          }
-                        : null,
-                    onChangeEnd: _controller.isInitialized &&
-                            !_controller.isLoading
-                        ? (value) {
-                            _controller.seek(
-                              Duration(
-                                milliseconds: value.round(),
-                              ),
-                            );
-                          }
-                        : null,
                   SliderTheme(
                     data: SliderTheme.of(context).copyWith(
                       showValueIndicator: ShowValueIndicator.always,
@@ -219,13 +186,10 @@ class _PlayerScreenState extends State<PlayerScreen> {
                       horizontal: 12,
                     ),
                     child: Row(
-                      mainAxisAlignment:
-                          MainAxisAlignment.spaceBetween,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
                           _formatDuration(
-                            _controller.position,
                             Duration(milliseconds: _sliderValue.round()),
                           ),
                         ),
@@ -264,10 +228,8 @@ class _PlayerScreenState extends State<PlayerScreen> {
     }
 
     if (_controller.hasError) {
-      // Show recovery button for recoverable errors
       return ElevatedButton.icon(
         onPressed: () async {
-          // Try to recover from error
           await _controller.tryRecover();
         },
         icon: const Icon(
@@ -283,21 +245,6 @@ class _PlayerScreenState extends State<PlayerScreen> {
       );
     }
 
-    if (_controller.isCompleted) {
-      // Only show replay button if not busy
-      return ElevatedButton.icon(
-        onPressed: _controller.isBusy
-            ? null
-            : () => _controller.restart(),
-        icon: const Icon(
-          Icons.replay_rounded,
-          size: 24,
-        ),
-        label: const Text('Replay'),
-        style: ElevatedButton.styleFrom(
-          minimumSize: const Size(180, 60),
-        ),
-      );
     String label = 'Play';
     IconData icon = Icons.play_arrow_rounded;
 
@@ -311,11 +258,9 @@ class _PlayerScreenState extends State<PlayerScreen> {
       label = 'Resume';
     }
 
-    // Normal play/pause - disable only if busy
     return ElevatedButton.icon(
       onPressed: _controller.isBusy
           ? null
-          : () => _controller.togglePlayPause(),
           : () {
               if (_controller.isCompleted) {
                 _controller.restart();
@@ -324,14 +269,10 @@ class _PlayerScreenState extends State<PlayerScreen> {
               }
             },
       icon: Icon(
-        _controller.isPlaying
-            ? Icons.pause_rounded
-            : Icons.play_arrow_rounded,
         icon,
         size: 36,
       ),
       label: Text(
-        _controller.isPlaying ? 'Pause' : 'Play',
         label,
         style: const TextStyle(
           fontSize: 18,
