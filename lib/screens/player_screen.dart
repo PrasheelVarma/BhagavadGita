@@ -211,14 +211,17 @@ class _PlayerScreenState extends State<PlayerScreen> {
     );
   }
 
-  int _selectedIntervalIndex = 1; // Default to 30s
+  int _selectedIntervalIndex = 2; // Default to 30s
 
   static const List<({String label, int seconds})> _jumpIntervals = [
     (label: '10s', seconds: 10),
+    (label: '15s', seconds: 15),
     (label: '30s', seconds: 30),
     (label: '1m', seconds: 60),
+    (label: '2m', seconds: 120),
     (label: '5m', seconds: 300),
     (label: '10m', seconds: 600),
+    (label: '15m', seconds: 900),
   ];
 
   ({String label, int seconds}) get _currentInterval =>
@@ -238,10 +241,18 @@ class _PlayerScreenState extends State<PlayerScreen> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Micro interval selector for 73-minute single track navigation
-        _buildIntervalSelector(),
+        // Creative interactive circular dial: hold & swipe left/right to change jump duration
+        _CircularIntervalDial(
+          selectedIndex: _selectedIntervalIndex,
+          intervals: _jumpIntervals,
+          onIntervalChanged: (newIndex) {
+            setState(() {
+              _selectedIntervalIndex = newIndex;
+            });
+          },
+        ),
 
-        const SizedBox(height: 22),
+        const SizedBox(height: 18),
 
         // Symmetrical Controls Row: [ -Skip ]  [ Play/Pause ]  [ +Skip ]
         Row(
@@ -269,66 +280,6 @@ class _PlayerScreenState extends State<PlayerScreen> {
           ],
         ),
       ],
-    );
-  }
-
-  Widget _buildIntervalSelector() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.85),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: const Color(0xFFFFCC80),
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.orange.withValues(alpha: 0.08),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: List.generate(_jumpIntervals.length, (index) {
-          final option = _jumpIntervals[index];
-          final isSelected = index == _selectedIntervalIndex;
-          return GestureDetector(
-            onTap: () {
-              setState(() {
-                _selectedIntervalIndex = index;
-              });
-            },
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
-              decoration: BoxDecoration(
-                color: isSelected ? const Color(0xFFD32F2F) : Colors.transparent,
-                borderRadius: BorderRadius.circular(18),
-                boxShadow: isSelected
-                    ? [
-                        BoxShadow(
-                          color: const Color(0xFFD32F2F).withValues(alpha: 0.3),
-                          blurRadius: 6,
-                          offset: const Offset(0, 2),
-                        ),
-                      ]
-                    : null,
-              ),
-              child: Text(
-                option.label,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-                  color: isSelected ? Colors.white : Colors.grey.shade700,
-                ),
-              ),
-            ),
-          );
-        }),
-      ),
     );
   }
 
@@ -507,6 +458,240 @@ class _PlayerScreenState extends State<PlayerScreen> {
         ),
       ),
     );
+  }
+}
+
+/// Interactive circular dial to hold and swipe left/right to adjust skip interval duration.
+class _CircularIntervalDial extends StatefulWidget {
+  final int selectedIndex;
+  final List<({String label, int seconds})> intervals;
+  final ValueChanged<int> onIntervalChanged;
+
+  const _CircularIntervalDial({
+    required this.selectedIndex,
+    required this.intervals,
+    required this.onIntervalChanged,
+  });
+
+  @override
+  State<_CircularIntervalDial> createState() => _CircularIntervalDialState();
+}
+
+class _CircularIntervalDialState extends State<_CircularIntervalDial> {
+  double _dragAccumulator = 0;
+  double _rotationAngle = 0;
+
+  void _handleDragUpdate(DragUpdateDetails details) {
+    _dragAccumulator += details.delta.dx;
+    setState(() {
+      _rotationAngle += details.delta.dx * 0.035;
+    });
+
+    const threshold = 26.0;
+    if (_dragAccumulator > threshold) {
+      final nextIndex =
+          (widget.selectedIndex + 1).clamp(0, widget.intervals.length - 1);
+      if (nextIndex != widget.selectedIndex) {
+        widget.onIntervalChanged(nextIndex);
+      }
+      _dragAccumulator = 0;
+    } else if (_dragAccumulator < -threshold) {
+      final prevIndex =
+          (widget.selectedIndex - 1).clamp(0, widget.intervals.length - 1);
+      if (prevIndex != widget.selectedIndex) {
+        widget.onIntervalChanged(prevIndex);
+      }
+      _dragAccumulator = 0;
+    }
+  }
+
+  void _handleDragEnd(DragEndDetails details) {
+    _dragAccumulator = 0;
+  }
+
+  void _step(int delta) {
+    final next =
+        (widget.selectedIndex + delta).clamp(0, widget.intervals.length - 1);
+    if (next != widget.selectedIndex) {
+      setState(() {
+        _rotationAngle += delta * 0.5;
+      });
+      widget.onIntervalChanged(next);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final current = widget.intervals[widget.selectedIndex];
+    final canGoPrev = widget.selectedIndex > 0;
+    final canGoNext = widget.selectedIndex < widget.intervals.length - 1;
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        // Left Step Arrow
+        IconButton(
+          icon: const Icon(Icons.chevron_left_rounded),
+          iconSize: 28,
+          color: canGoPrev ? const Color(0xFFD32F2F) : Colors.grey.shade300,
+          splashRadius: 18,
+          tooltip: canGoPrev ? 'Decrease skip time' : null,
+          onPressed: canGoPrev ? () => _step(-1) : null,
+        ),
+
+        // Interactive Swipeable Circular Dial
+        GestureDetector(
+          onHorizontalDragUpdate: _handleDragUpdate,
+          onHorizontalDragEnd: _handleDragEnd,
+          onTap: () {
+            final next = (widget.selectedIndex + 1) % widget.intervals.length;
+            _step(next - widget.selectedIndex);
+          },
+          child: Tooltip(
+            message: 'Swipe left/right or tap to change skip interval',
+            child: SizedBox(
+              width: 78,
+              height: 78,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  // Rotating notched ring
+                  Transform.rotate(
+                    angle: _rotationAngle,
+                    child: CustomPaint(
+                      size: const Size(78, 78),
+                      painter: _DialNotchPainter(
+                        totalSteps: widget.intervals.length,
+                        currentIndex: widget.selectedIndex,
+                      ),
+                    ),
+                  ),
+
+                  // Center circular disc
+                  Container(
+                    width: 54,
+                    height: 54,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: const RadialGradient(
+                        colors: [
+                          Colors.white,
+                          Color(0xFFFFF8E1),
+                        ],
+                      ),
+                      border: Border.all(
+                        color: const Color(0xFFFFB74D),
+                        width: 1.5,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.orange.withValues(alpha: 0.18),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 180),
+                          transitionBuilder: (child, animation) =>
+                              ScaleTransition(scale: animation, child: child),
+                          child: Text(
+                            current.label,
+                            key: ValueKey<String>(current.label),
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFFD32F2F),
+                              letterSpacing: -0.2,
+                            ),
+                          ),
+                        ),
+                        const Text(
+                          'SWIPE',
+                          style: TextStyle(
+                            fontSize: 7.5,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFFE65100),
+                            letterSpacing: 0.8,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+
+        // Right Step Arrow
+        IconButton(
+          icon: const Icon(Icons.chevron_right_rounded),
+          iconSize: 28,
+          color: canGoNext ? const Color(0xFFD32F2F) : Colors.grey.shade300,
+          splashRadius: 18,
+          tooltip: canGoNext ? 'Increase skip time' : null,
+          onPressed: canGoNext ? () => _step(1) : null,
+        ),
+      ],
+    );
+  }
+}
+
+class _DialNotchPainter extends CustomPainter {
+  final int totalSteps;
+  final int currentIndex;
+
+  _DialNotchPainter({
+    required this.totalSteps,
+    required this.currentIndex,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = size.width / 2;
+
+    // Draw outer subtle track ring
+    final trackPaint = Paint()
+      ..color = const Color(0xFFFFE0B2)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.2;
+    canvas.drawCircle(center, radius - 2, trackPaint);
+
+    // Draw radial tick notches
+    const notchCount = 16;
+    for (int i = 0; i < notchCount; i++) {
+      final angle = (i * 2 * math.pi) / notchCount;
+      final isMajor = i % 2 == 0;
+      final innerR = radius - (isMajor ? 7.0 : 4.0);
+      final outerR = radius - 1.0;
+
+      final p1 = Offset(
+        center.dx + innerR * math.cos(angle),
+        center.dy + innerR * math.sin(angle),
+      );
+      final p2 = Offset(
+        center.dx + outerR * math.cos(angle),
+        center.dy + outerR * math.sin(angle),
+      );
+
+      final notchPaint = Paint()
+        ..color = isMajor ? const Color(0xFFE65100) : const Color(0xFFFFB74D)
+        ..strokeWidth = isMajor ? 1.5 : 1.0
+        ..strokeCap = StrokeCap.round;
+
+      canvas.drawLine(p1, p2, notchPaint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _DialNotchPainter oldDelegate) {
+    return oldDelegate.currentIndex != currentIndex;
   }
 }
 
