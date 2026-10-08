@@ -87,11 +87,7 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    final isLandscape =
-        MediaQuery.of(context).orientation == Orientation.landscape;
-    final imageWidth = isLandscape
-        ? (size.height * 0.62).clamp(160.0, 220.0)
-        : (size.width * 0.72).clamp(240.0, 340.0);
+    final imageWidth = (size.width * 0.72).clamp(240.0, 340.0);
 
     return Scaffold(
       body: Container(
@@ -111,38 +107,17 @@ class _SplashScreenState extends State<SplashScreen>
           ),
         ),
         child: SafeArea(
-          child: isLandscape
-              ? _buildLandscapeSplash(imageWidth)
-              : _buildPortraitSplash(imageWidth),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Spacer(flex: 2),
+              _buildArtwork(imageWidth),
+              const SizedBox(height: 32),
+              _buildTitleSection(),
+              const Spacer(flex: 3),
+            ],
+          ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildPortraitSplash(double imageWidth) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        const Spacer(flex: 2),
-        _buildArtwork(imageWidth),
-        const SizedBox(height: 32),
-        _buildTitleSection(),
-        const Spacer(flex: 3),
-      ],
-    );
-  }
-
-  Widget _buildLandscapeSplash(double imageWidth) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          _buildArtwork(imageWidth),
-          const SizedBox(width: 36),
-          _buildTitleSection(),
-        ],
       ),
     );
   }

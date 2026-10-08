@@ -70,12 +70,9 @@ class _PlayerScreenState extends State<PlayerScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isLandscape =
-        MediaQuery.of(context).orientation == Orientation.landscape;
-
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(isLandscape ? 44 : 56),
+        preferredSize: const Size.fromHeight(56),
         child: Container(
           decoration: BoxDecoration(
             gradient: const LinearGradient(
@@ -101,16 +98,16 @@ class _PlayerScreenState extends State<PlayerScreen> {
               ),
             ),
           ),
-          child: SafeArea(
+          child: const SafeArea(
             child: Center(
               child: Text(
                 'Bhagavad Gita',
                 style: TextStyle(
-                  fontSize: isLandscape ? 17 : 20,
+                  fontSize: 20,
                   fontWeight: FontWeight.w800,
                   color: Colors.white,
                   letterSpacing: 1.2,
-                  shadows: const [
+                  shadows: [
                     Shadow(
                       color: Colors.black38,
                       blurRadius: 6,
@@ -138,156 +135,73 @@ class _PlayerScreenState extends State<PlayerScreen> {
           ),
         ),
         child: SafeArea(
-          child: isLandscape
-              ? _buildLandscapeLayout()
-              : _buildPortraitLayout(),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPortraitLayout() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 20,
-        vertical: 8,
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          // 1. Unified Divine Chakra Artwork Seeker
-          _DivineChakraSeekControl(
-            size: 260,
-            imagePath: 'assets/artwork.png',
-            isPlaying: _controller.isPlaying,
-            position: _dragPosition != null
-                ? Duration(milliseconds: _dragPosition!.round())
-                : _controller.position,
-            duration: _controller.duration,
-            onChanged: (duration) {
-              if (_controller.isInitialized && !_controller.isLoading) {
-                setState(() {
-                  _dragPosition = duration.inMilliseconds.toDouble();
-                });
-              }
-            },
-            onChangeEnd: (duration) {
-              if (_controller.isInitialized && !_controller.isLoading) {
-                _controller.seek(duration);
-                setState(() {
-                  _dragPosition = null;
-                });
-              }
-            },
-          ),
-
-          // 2. Horizontal seek slider & synchronized time indicators
-          _buildSliderSection(),
-
-          // 3. Devotional Media Controls Console Card
-          Container(
+          child: Padding(
             padding: const EdgeInsets.symmetric(
-              horizontal: 14,
-              vertical: 14,
+              horizontal: 20,
+              vertical: 8,
             ),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.75),
-              borderRadius: BorderRadius.circular(28),
-              border: Border.all(
-                color: const Color(0xFFFFE082),
-                width: 1.2,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.orange.withValues(alpha: 0.10),
-                  blurRadius: 16,
-                  offset: const Offset(0, 5),
-                ),
-              ],
-            ),
-            child: _buildPlaybackControls(),
-          ),
-
-          // 4. Dedicated Devotional Utility Toolbar (Speed, Timer, Loop)
-          _buildBottomUtilityBar(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildLandscapeLayout() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          // Left: Scaled Divine Chakra Artwork Seeker
-          Expanded(
-            flex: 4,
-            child: Center(
-              child: _DivineChakraSeekControl(
-                size: 190,
-                imagePath: 'assets/artwork.png',
-                isPlaying: _controller.isPlaying,
-                position: _dragPosition != null
-                    ? Duration(milliseconds: _dragPosition!.round())
-                    : _controller.position,
-                duration: _controller.duration,
-                onChanged: (duration) {
-                  if (_controller.isInitialized && !_controller.isLoading) {
-                    setState(() {
-                      _dragPosition = duration.inMilliseconds.toDouble();
-                    });
-                  }
-                },
-                onChangeEnd: (duration) {
-                  if (_controller.isInitialized && !_controller.isLoading) {
-                    _controller.seek(duration);
-                    setState(() {
-                      _dragPosition = null;
-                    });
-                  }
-                },
-              ),
-            ),
-          ),
-
-          const SizedBox(width: 16),
-
-          // Right: Seek slider + Controls + Utility Toolbar
-          Expanded(
-            flex: 6,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
+                // 1. Unified Divine Chakra Artwork Seeker
+                _DivineChakraSeekControl(
+                  size: 260,
+                  imagePath: 'assets/artwork.png',
+                  isPlaying: _controller.isPlaying,
+                  position: _dragPosition != null
+                      ? Duration(milliseconds: _dragPosition!.round())
+                      : _controller.position,
+                  duration: _controller.duration,
+                  onChanged: (duration) {
+                    if (_controller.isInitialized && !_controller.isLoading) {
+                      setState(() {
+                        _dragPosition = duration.inMilliseconds.toDouble();
+                      });
+                    }
+                  },
+                  onChangeEnd: (duration) {
+                    if (_controller.isInitialized && !_controller.isLoading) {
+                      _controller.seek(duration);
+                      setState(() {
+                        _dragPosition = null;
+                      });
+                    }
+                  },
+                ),
+
+                // 2. Horizontal seek slider & synchronized time indicators
                 _buildSliderSection(),
+
+                // 3. Devotional Media Controls Console Card
                 Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 8,
+                    horizontal: 14,
+                    vertical: 14,
                   ),
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.75),
-                    borderRadius: BorderRadius.circular(22),
+                    borderRadius: BorderRadius.circular(28),
                     border: Border.all(
                       color: const Color(0xFFFFE082),
                       width: 1.2,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.orange.withValues(alpha: 0.08),
-                        blurRadius: 12,
-                        offset: const Offset(0, 4),
+                        color: Colors.orange.withValues(alpha: 0.10),
+                        blurRadius: 16,
+                        offset: const Offset(0, 5),
                       ),
                     ],
                   ),
                   child: _buildPlaybackControls(),
                 ),
+
+                // 4. Dedicated Devotional Utility Toolbar (Speed, Timer, Loop)
                 _buildBottomUtilityBar(),
               ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }

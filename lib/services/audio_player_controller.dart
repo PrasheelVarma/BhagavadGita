@@ -148,7 +148,7 @@ class AudioPlayerController extends ChangeNotifier {
           title: 'Bhagavad Gita',
           artist: 'Bhagavad Gita',
           album: 'Bhagavad Gita',
-          artUri: Uri.parse('asset:///assets/artwork.png'),
+          artUri: kIsWeb ? null : Uri.parse('asset:///assets/artwork.png'),
         ),
       );
 
