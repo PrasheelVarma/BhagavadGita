@@ -107,15 +107,20 @@ class _SplashScreenState extends State<SplashScreen>
           ),
         ),
         child: SafeArea(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Spacer(flex: 2),
-              _buildArtwork(imageWidth),
-              const SizedBox(height: 32),
-              _buildTitleSection(),
-              const Spacer(flex: 3),
-            ],
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 480),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Spacer(flex: 2),
+                  _buildArtwork(imageWidth),
+                  const SizedBox(height: 32),
+                  _buildTitleSection(),
+                  const Spacer(flex: 3),
+                ],
+              ),
+            ),
           ),
         ),
       ),

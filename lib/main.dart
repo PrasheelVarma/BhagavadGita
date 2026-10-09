@@ -73,46 +73,21 @@ class BhagavadGitaApp extends StatelessWidget {
           trackHeight: 6,
         ),
       ),
-      builder: (context, child) {
-        if (kIsWeb) {
-          final isWide = MediaQuery.of(context).size.width > 540;
-          if (isWide) {
-            return Scaffold(
-              backgroundColor: const Color(0xFF2C0B0E),
-              body: Center(
-                child: Container(
-                  constraints: const BoxConstraints(
-                    maxWidth: 440,
-                    maxHeight: 880,
-                  ),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(28),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.5),
-                        blurRadius: 36,
-                        spreadRadius: 6,
-                        offset: const Offset(0, 12),
-                      ),
-                    ],
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(28),
-                    child: child ?? const SizedBox.shrink(),
-                  ),
-                ),
-              ),
-            );
-          }
-        }
-        return child ?? const SizedBox.shrink();
-      },
       home: Builder(
         builder: (context) => SplashScreen(
           onSplashComplete: () {
             Navigator.of(context).pushReplacement(
-              MaterialPageRoute(
-                builder: (context) => const GitaPlayerScreen(),
+              PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) =>
+                    const GitaPlayerScreen(),
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) {
+                  return FadeTransition(
+                    opacity: animation,
+                    child: child,
+                  );
+                },
+                transitionDuration: const Duration(milliseconds: 600),
               ),
             );
           },

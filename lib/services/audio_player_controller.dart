@@ -456,13 +456,16 @@ class AudioPlayerController extends ChangeNotifier {
     });
 
     // Headphone / Bluetooth disconnect (becoming noisy) handler
-    AudioSession.instance.then((session) {
-      if (_isDisposed) return;
-      _becomingNoisySubscription = session.becomingNoisyEventStream.listen((_) {
+    if (!kIsWeb) {
+      AudioSession.instance.then((session) {
         if (_isDisposed) return;
-        pause();
+        _becomingNoisySubscription =
+            session.becomingNoisyEventStream.listen((_) {
+          if (_isDisposed) return;
+          pause();
+        });
       });
-    });
+    }
   }
 
   Future<void> _detachListeners() async {

@@ -135,70 +135,88 @@ class _PlayerScreenState extends State<PlayerScreen> {
           ),
         ),
         child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 20,
-              vertical: 8,
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                // 1. Unified Divine Chakra Artwork Seeker
-                _DivineChakraSeekControl(
-                  size: 260,
-                  imagePath: 'assets/artwork.png',
-                  isPlaying: _controller.isPlaying,
-                  position: _dragPosition != null
-                      ? Duration(milliseconds: _dragPosition!.round())
-                      : _controller.position,
-                  duration: _controller.duration,
-                  onChanged: (duration) {
-                    if (_controller.isInitialized && !_controller.isLoading) {
-                      setState(() {
-                        _dragPosition = duration.inMilliseconds.toDouble();
-                      });
-                    }
-                  },
-                  onChangeEnd: (duration) {
-                    if (_controller.isInitialized && !_controller.isLoading) {
-                      _controller.seek(duration);
-                      setState(() {
-                        _dragPosition = null;
-                      });
-                    }
-                  },
-                ),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 480),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final availableHeight = constraints.maxHeight;
+                  final isCompact = availableHeight < 640;
+                  final chakraSize = isCompact
+                      ? (availableHeight * 0.33).clamp(180.0, 250.0)
+                      : 260.0;
 
-                // 2. Horizontal seek slider & synchronized time indicators
-                _buildSliderSection(),
-
-                // 3. Devotional Media Controls Console Card
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 14,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.75),
-                    borderRadius: BorderRadius.circular(28),
-                    border: Border.all(
-                      color: const Color(0xFFFFE082),
-                      width: 1.2,
+                  return Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: isCompact ? 4 : 8,
                     ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.orange.withValues(alpha: 0.10),
-                        blurRadius: 16,
-                        offset: const Offset(0, 5),
-                      ),
-                    ],
-                  ),
-                  child: _buildPlaybackControls(),
-                ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        // 1. Unified Divine Chakra Artwork Seeker
+                        _DivineChakraSeekControl(
+                          size: chakraSize,
+                          imagePath: 'assets/artwork.png',
+                          isPlaying: _controller.isPlaying,
+                          position: _dragPosition != null
+                              ? Duration(milliseconds: _dragPosition!.round())
+                              : _controller.position,
+                          duration: _controller.duration,
+                          onChanged: (duration) {
+                            if (_controller.isInitialized &&
+                                !_controller.isLoading) {
+                              setState(() {
+                                _dragPosition =
+                                    duration.inMilliseconds.toDouble();
+                              });
+                            }
+                          },
+                          onChangeEnd: (duration) {
+                            if (_controller.isInitialized &&
+                                !_controller.isLoading) {
+                              _controller.seek(duration);
+                              setState(() {
+                                _dragPosition = null;
+                              });
+                            }
+                          },
+                        ),
 
-                // 4. Dedicated Devotional Utility Toolbar (Speed, Timer, Loop)
-                _buildBottomUtilityBar(),
-              ],
+                        // 2. Horizontal seek slider & synchronized time indicators
+                        _buildSliderSection(),
+
+                        // 3. Devotional Media Controls Console Card
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 14,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.75),
+                            borderRadius: BorderRadius.circular(28),
+                            border: Border.all(
+                              color: const Color(0xFFFFE082),
+                              width: 1.2,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.orange.withValues(alpha: 0.10),
+                                blurRadius: 16,
+                                offset: const Offset(0, 5),
+                              ),
+                            ],
+                          ),
+                          child: _buildPlaybackControls(),
+                        ),
+
+                        // 4. Dedicated Devotional Utility Toolbar (Speed, Timer, Loop)
+                        _buildBottomUtilityBar(),
+                      ],
+                    ),
+                  );
+                },
+              ),
             ),
           ),
         ),
@@ -1474,7 +1492,6 @@ class _DivineChakraSeekPainter extends CustomPainter {
             Color(0xFFD32F2F),
           ],
           stops: [0.0, 0.50, 1.0],
-          transform: GradientRotation(-math.pi / 2),
         ).createShader(progressRect)
         ..style = PaintingStyle.stroke
         ..strokeWidth = isDragging ? 8.0 : 6.5
