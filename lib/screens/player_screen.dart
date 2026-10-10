@@ -98,22 +98,27 @@ class _PlayerScreenState extends State<PlayerScreen> {
               ),
             ),
           ),
-          child: const SafeArea(
+          child: SafeArea(
             child: Center(
-              child: Text(
-                'Bhagavad Gita',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.white,
-                  letterSpacing: 1.2,
-                  shadows: [
-                    Shadow(
-                      color: Colors.black38,
-                      blurRadius: 6,
-                      offset: Offset(0, 2),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 600),
+                child: const Center(
+                  child: Text(
+                    'Bhagavad Gita',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                      letterSpacing: 1.2,
+                      shadows: [
+                        Shadow(
+                          color: Colors.black38,
+                          blurRadius: 6,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
             ),
@@ -121,6 +126,8 @@ class _PlayerScreenState extends State<PlayerScreen> {
         ),
       ),
       body: Container(
+        width: double.infinity,
+        height: double.infinity,
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
@@ -141,78 +148,109 @@ class _PlayerScreenState extends State<PlayerScreen> {
               child: LayoutBuilder(
                 builder: (context, constraints) {
                   final availableHeight = constraints.maxHeight;
-                  final isCompact = availableHeight < 640;
-                  final chakraSize = isCompact
-                      ? (availableHeight * 0.33).clamp(180.0, 250.0)
-                      : 260.0;
+                  final isCompact = availableHeight < 680;
+                  final isVeryCompact = availableHeight < 560;
 
-                  return Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: isCompact ? 4 : 8,
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        // 1. Unified Divine Chakra Artwork Seeker
-                        _DivineChakraSeekControl(
-                          size: chakraSize,
-                          imagePath: 'assets/artwork.png',
-                          isPlaying: _controller.isPlaying,
-                          position: _dragPosition != null
-                              ? Duration(milliseconds: _dragPosition!.round())
-                              : _controller.position,
-                          duration: _controller.duration,
-                          onChanged: (duration) {
-                            if (_controller.isInitialized &&
-                                !_controller.isLoading) {
-                              setState(() {
-                                _dragPosition =
-                                    duration.inMilliseconds.toDouble();
-                              });
-                            }
-                          },
-                          onChangeEnd: (duration) {
-                            if (_controller.isInitialized &&
-                                !_controller.isLoading) {
-                              _controller.seek(duration);
-                              setState(() {
-                                _dragPosition = null;
-                              });
-                            }
-                          },
+                  // Responsively scale the chakra artwork so controls always fit comfortably
+                  final chakraSize = isVeryCompact
+                      ? 150.0
+                      : isCompact
+                          ? (availableHeight * 0.28).clamp(160.0, 220.0)
+                          : 260.0;
+
+                  final vSpacing = isVeryCompact
+                      ? 4.0
+                      : isCompact
+                          ? 8.0
+                          : 16.0;
+
+                  final content = Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      SizedBox(height: vSpacing * 0.5),
+                      // 1. Unified Divine Chakra Artwork Seeker
+                      _DivineChakraSeekControl(
+                        size: chakraSize,
+                        imagePath: 'assets/artwork.png',
+                        isPlaying: _controller.isPlaying,
+                        position: _dragPosition != null
+                            ? Duration(milliseconds: _dragPosition!.round())
+                            : _controller.position,
+                        duration: _controller.duration,
+                        onChanged: (duration) {
+                          if (_controller.isInitialized &&
+                              !_controller.isLoading) {
+                            setState(() {
+                              _dragPosition =
+                                  duration.inMilliseconds.toDouble();
+                            });
+                          }
+                        },
+                        onChangeEnd: (duration) {
+                          if (_controller.isInitialized &&
+                              !_controller.isLoading) {
+                            _controller.seek(duration);
+                            setState(() {
+                              _dragPosition = null;
+                            });
+                          }
+                        },
+                      ),
+
+                      SizedBox(height: vSpacing),
+
+                      // 2. Horizontal seek slider & synchronized time indicators
+                      _buildSliderSection(),
+
+                      SizedBox(height: vSpacing),
+
+                      // 3. Devotional Media Controls Console Card
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: isVeryCompact ? 8 : 14,
                         ),
-
-                        // 2. Horizontal seek slider & synchronized time indicators
-                        _buildSliderSection(),
-
-                        // 3. Devotional Media Controls Console Card
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 14,
-                            vertical: 14,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.75),
+                          borderRadius: BorderRadius.circular(28),
+                          border: Border.all(
+                            color: const Color(0xFFFFE082),
+                            width: 1.2,
                           ),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.75),
-                            borderRadius: BorderRadius.circular(28),
-                            border: Border.all(
-                              color: const Color(0xFFFFE082),
-                              width: 1.2,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.orange.withValues(alpha: 0.10),
+                              blurRadius: 16,
+                              offset: const Offset(0, 5),
                             ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.orange.withValues(alpha: 0.10),
-                                blurRadius: 16,
-                                offset: const Offset(0, 5),
-                              ),
-                            ],
-                          ),
-                          child: _buildPlaybackControls(),
+                          ],
                         ),
+                        child: _buildPlaybackControls(),
+                      ),
 
-                        // 4. Dedicated Devotional Utility Toolbar (Speed, Timer, Loop)
-                        _buildBottomUtilityBar(),
-                      ],
+                      SizedBox(height: vSpacing),
+
+                      // 4. Dedicated Devotional Utility Toolbar (Speed, Timer, Loop)
+                      _buildBottomUtilityBar(),
+                      SizedBox(height: vSpacing * 0.5),
+                    ],
+                  );
+
+                  // If the screen height is plenty (like normal portrait mobile), let spaceEvenly fill height.
+                  // If screen height is constrained (desktop/laptop/landscape), SingleChildScrollView prevents any clipping.
+                  return SingleChildScrollView(
+                    physics: const ClampingScrollPhysics(),
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minHeight: availableHeight,
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: isCompact ? 4 : 8,
+                        ),
+                        child: content,
+                      ),
                     ),
                   );
                 },
@@ -385,21 +423,24 @@ class _PlayerScreenState extends State<PlayerScreen> {
           (label: '60 Minutes', duration: const Duration(minutes: 60)),
         ];
 
-        return Container(
-          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
-          decoration: BoxDecoration(
-            color: const Color(0xFFFFF8E7),
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-            border: Border.all(color: const Color(0xFFFFCC80), width: 1.5),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.15),
-                blurRadius: 20,
-                offset: const Offset(0, -4),
+        return Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 480),
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFF8E7),
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+                border: Border.all(color: const Color(0xFFFFCC80), width: 1.5),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.15),
+                    blurRadius: 20,
+                    offset: const Offset(0, -4),
+                  ),
+                ],
               ),
-            ],
-          ),
-          child: Column(
+              child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
@@ -469,10 +510,12 @@ class _PlayerScreenState extends State<PlayerScreen> {
               }),
             ],
           ),
-        );
-      },
+        ),
+      ),
     );
-  }
+  },
+);
+}
 
   void _showSpeedSelectorSheet() {
     showModalBottomSheet(
@@ -481,21 +524,24 @@ class _PlayerScreenState extends State<PlayerScreen> {
       builder: (ctx) {
         const speeds = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0];
 
-        return Container(
-          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-          decoration: BoxDecoration(
-            color: const Color(0xFFFFF8E7),
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-            border: Border.all(color: const Color(0xFFFFCC80), width: 1.5),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.15),
-                blurRadius: 20,
-                offset: const Offset(0, -4),
+        return Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 480),
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFF8E7),
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+                border: Border.all(color: const Color(0xFFFFCC80), width: 1.5),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.15),
+                    blurRadius: 20,
+                    offset: const Offset(0, -4),
+                  ),
+                ],
               ),
-            ],
-          ),
-          child: Column(
+              child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
@@ -577,10 +623,12 @@ class _PlayerScreenState extends State<PlayerScreen> {
               const SizedBox(height: 12),
             ],
           ),
-        );
-      },
+        ),
+      ),
     );
-  }
+  },
+);
+}
 
   Widget _buildBottomUtilityBar() {
     final speed = _controller.speed;

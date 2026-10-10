@@ -87,7 +87,9 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    final imageWidth = (size.width * 0.72).clamp(240.0, 340.0);
+    final maxAvailable = math.min(size.width * 0.72, size.height * 0.40);
+    final imageWidth = maxAvailable.clamp(160.0, 300.0);
+    final isShort = size.height < 600;
 
     return Scaffold(
       body: Container(
@@ -110,15 +112,22 @@ class _SplashScreenState extends State<SplashScreen>
           child: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 480),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Spacer(flex: 2),
-                  _buildArtwork(imageWidth),
-                  const SizedBox(height: 32),
-                  _buildTitleSection(),
-                  const Spacer(flex: 3),
-                ],
+              child: SingleChildScrollView(
+                physics: const ClampingScrollPhysics(),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: isShort ? 12 : 24,
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _buildArtwork(imageWidth),
+                      SizedBox(height: isShort ? 20 : 32),
+                      _buildTitleSection(),
+                    ],
+                  ),
+                ),
               ),
             ),
           ),
