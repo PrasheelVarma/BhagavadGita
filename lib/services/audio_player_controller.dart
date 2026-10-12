@@ -143,16 +143,22 @@ class AudioPlayerController extends ChangeNotifier {
       // Use setAsset() — the correct API for Flutter bundled assets.
       // The tag: MediaItem is required by just_audio_background for media
       // session / notification metadata.
-      await _audioPlayer.setAsset(
-        audioAssetPath,
-        tag: MediaItem(
-          id: audioAssetPath,
-          title: 'Bhagavad Gita',
-          artist: 'Bhagavad Gita',
-          album: 'Bhagavad Gita',
-          artUri: kIsWeb ? null : Uri.parse('asset:///assets/artwork.png'),
-        ),
-      );
+      // On web, skip the MediaItem tag entirely since just_audio_background
+      // is an Android/iOS-only package and can cause errors on web.
+      if (kIsWeb) {
+        await _audioPlayer.setAsset(audioAssetPath);
+      } else {
+        await _audioPlayer.setAsset(
+          audioAssetPath,
+          tag: MediaItem(
+            id: audioAssetPath,
+            title: 'Bhagavad Gita',
+            artist: 'Bhagavad Gita',
+            album: 'Bhagavad Gita',
+            artUri: Uri.parse('asset:///assets/artwork.png'),
+          ),
+        );
+      }
 
       if (_isDisposed) {
         return;

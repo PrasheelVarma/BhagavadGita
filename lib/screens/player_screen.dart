@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:math' as math;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../services/audio_player_controller.dart';
@@ -71,7 +72,60 @@ class _PlayerScreenState extends State<PlayerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
+      appBar: kIsWeb
+          // Web: Use standard AppBar with proper height constraints.
+          // The custom PreferredSize+Container+SafeArea approach causes
+          // infinite height on web where SafeArea has no system insets.
+          ? AppBar(
+              toolbarHeight: 56,
+              centerTitle: true,
+              title: const Text(
+                'Bhagavad Gita',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.white,
+                  letterSpacing: 1.2,
+                  shadows: [
+                    Shadow(
+                      color: Colors.black38,
+                      blurRadius: 6,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
+                ),
+              ),
+              flexibleSpace: Container(
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Color(0xFF8E0E00),
+                      Color(0xFFB71C1C),
+                      Color(0xFFE65100),
+                    ],
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF8E0E00).withValues(alpha: 0.35),
+                      blurRadius: 10,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+              ),
+              elevation: 0,
+              bottom: PreferredSize(
+                preferredSize: const Size.fromHeight(1.5),
+                child: Container(
+                  height: 1.5,
+                  color: const Color(0xFFFFD54F),
+                ),
+              ),
+            )
+          // Android: Keep the exact existing custom AppBar structure.
+          : PreferredSize(
         preferredSize: const Size.fromHeight(56),
         child: Container(
           decoration: BoxDecoration(
