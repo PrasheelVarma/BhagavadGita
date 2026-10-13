@@ -7,6 +7,7 @@ import 'package:just_audio_background/just_audio_background.dart';
 import 'package:bhagavad_gita/screens/player_screen.dart';
 import 'package:bhagavad_gita/screens/splash_screen.dart';
 import 'package:bhagavad_gita/services/audio_player_controller.dart';
+import 'package:bhagavad_gita/web/website_app.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -73,26 +74,31 @@ class BhagavadGitaApp extends StatelessWidget {
           trackHeight: 6,
         ),
       ),
-      home: Builder(
-        builder: (context) => SplashScreen(
-          onSplashComplete: () {
-            Navigator.of(context).pushReplacement(
-              PageRouteBuilder(
-                pageBuilder: (context, animation, secondaryAnimation) =>
-                    const GitaPlayerScreen(),
-                transitionsBuilder:
-                    (context, animation, secondaryAnimation, child) {
-                  return FadeTransition(
-                    opacity: animation,
-                    child: child,
+      // Web: Full website with navigation pages.
+      // Android/Desktop: Direct splash → player flow (unchanged).
+      home: kIsWeb
+          ? const WebsiteApp()
+          : Builder(
+              builder: (context) => SplashScreen(
+                onSplashComplete: () {
+                  Navigator.of(context).pushReplacement(
+                    PageRouteBuilder(
+                      pageBuilder:
+                          (context, animation, secondaryAnimation) =>
+                              const GitaPlayerScreen(),
+                      transitionsBuilder:
+                          (context, animation, secondaryAnimation, child) {
+                        return FadeTransition(
+                          opacity: animation,
+                          child: child,
+                        );
+                      },
+                      transitionDuration: const Duration(milliseconds: 600),
+                    ),
                   );
                 },
-                transitionDuration: const Duration(milliseconds: 600),
               ),
-            );
-          },
-        ),
-      ),
+            ),
     );
   }
 }
