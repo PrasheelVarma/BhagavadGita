@@ -9,7 +9,7 @@ class AboutPage extends StatelessWidget {
 
   static const String _githubProfileUrl = 'https://github.com/PrasheelVarma';
   static const String _githubRepoUrl =
-      'https://github.com/PrasheelVarma/BhagavadGita-Website';
+      'https://github.com/PrasheelVarma/BhagavadGita';
 
   @override
   Widget build(BuildContext context) {
@@ -205,7 +205,7 @@ class AboutPage extends StatelessWidget {
                                   ),
                                   const SizedBox(width: 8),
                                   Text(
-                                    'GitHub: PrasheelVarma/BhagavadGita-Website',
+                                    'GitHub: PrasheelVarma/BhagavadGita',
                                     style: GitaTextStyles.bodyText.copyWith(
                                       color: GitaColors.crimson,
                                       fontWeight: FontWeight.w600,

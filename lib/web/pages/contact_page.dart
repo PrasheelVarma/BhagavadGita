@@ -9,9 +9,9 @@ class ContactPage extends StatelessWidget {
 
   static const String _githubProfileUrl = 'https://github.com/PrasheelVarma';
   static const String _githubRepoUrl =
-      'https://github.com/PrasheelVarma/BhagavadGita-Website';
+      'https://github.com/PrasheelVarma/BhagavadGita';
   static const String _githubIssuesUrl =
-      'https://github.com/PrasheelVarma/BhagavadGita-Website/issues';
+      'https://github.com/PrasheelVarma/BhagavadGita/issues';
 
   @override
   Widget build(BuildContext context) {

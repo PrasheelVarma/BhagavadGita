@@ -51,7 +51,7 @@ class _HeroSection extends StatelessWidget {
   bool get _isMobile => screenWidth < GitaLayout.mobileBreakpoint;
 
   static const String _androidReleaseUrl =
-      'https://github.com/PrasheelVarma/BhagavadGita-Website/releases/tag/v1.0-android';
+      'https://github.com/PrasheelVarma/BhagavadGita/releases/tag/v1.0-android';
 
   @override
   Widget build(BuildContext context) {
@@ -277,7 +277,7 @@ class _PlatformAvailabilitySection extends StatelessWidget {
   bool get _isTablet => screenWidth < GitaLayout.tabletBreakpoint;
 
   static const String _androidReleaseUrl =
-      'https://github.com/PrasheelVarma/BhagavadGita-Website/releases/tag/v1.0-android';
+      'https://github.com/PrasheelVarma/BhagavadGita/releases/tag/v1.0-android';
 
   @override
   Widget build(BuildContext context) {
@@ -625,7 +625,7 @@ class _FeaturesComparisonSection extends StatelessWidget {
                         ],
                         actionText: 'View GitHub Release',
                         onAction: () => launchUrlSafely(
-                          'https://github.com/PrasheelVarma/BhagavadGita-Website/releases/tag/v1.0-android',
+                          'https://github.com/PrasheelVarma/BhagavadGita/releases/tag/v1.0-android',
                         ),
                       ),
                     ],
@@ -667,7 +667,7 @@ class _FeaturesComparisonSection extends StatelessWidget {
                           ],
                           actionText: 'View GitHub Release',
                           onAction: () => launchUrlSafely(
-                            'https://github.com/PrasheelVarma/BhagavadGita-Website/releases/tag/v1.0-android',
+                            'https://github.com/PrasheelVarma/BhagavadGita/releases/tag/v1.0-android',
                           ),
                         ),
                       ),
@@ -814,7 +814,7 @@ class _AndroidDownloadBanner extends StatelessWidget {
   bool get _isMobile => screenWidth < GitaLayout.mobileBreakpoint;
 
   static const String _androidReleaseUrl =
-      'https://github.com/PrasheelVarma/BhagavadGita-Website/releases/tag/v1.0-android';
+      'https://github.com/PrasheelVarma/BhagavadGita/releases/tag/v1.0-android';
 
   @override
   Widget build(BuildContext context) {

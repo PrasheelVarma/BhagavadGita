@@ -20,9 +20,9 @@ class WebsiteFooter extends StatelessWidget {
 
   static const String _githubProfileUrl = 'https://github.com/PrasheelVarma';
   static const String _githubRepoUrl =
-      'https://github.com/PrasheelVarma/BhagavadGita-Website';
+      'https://github.com/PrasheelVarma/BhagavadGita';
   static const String _androidReleaseUrl =
-      'https://github.com/PrasheelVarma/BhagavadGita-Website/releases/tag/v1.0-android';
+      'https://github.com/PrasheelVarma/BhagavadGita/releases/tag/v1.0-android';
 
   @override
   Widget build(BuildContext context) {
