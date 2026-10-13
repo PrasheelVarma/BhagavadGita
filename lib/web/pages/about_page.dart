@@ -149,9 +149,9 @@ class AboutPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 44),
 
-                  // Audio Credits & Acknowledgements
+                  // Audio Credits
                   _buildSection(
-                    title: 'Audio Credits & Acknowledgements',
+                    title: 'Audio Credits',
                     children: [
                       _buildInfoCard(
                         icon: Icons.mic_external_on_rounded,
@@ -161,8 +161,7 @@ class AboutPage extends StatelessWidget {
                       ),
                       const SizedBox(height: 14),
                       _buildPlaceholderNote(
-                        'Detailed archival provenance, remastering references, and formal copyright/licensing '
-                        'attributions will be documented here as additional historical details are verified.',
+                        'The maintainer does not claim ownership of the audio recording. Full credit is given to Sri Ghantasala Venkateswara Rao for his vocal performance. The recording remains subject to the rights of its respective copyright owners.',
                       ),
                     ],
                   ),
@@ -181,12 +180,12 @@ class AboutPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 44),
 
-                  // Open Source & Licensing
+                  // Code Usage & Repository
                   _buildSection(
-                    title: 'Open Source & License',
+                    title: 'Code Usage & Repository',
                     children: [
                       const _Paragraph(
-                        'The software source code for this project is open source and released under the MIT License.',
+                        'This repository is publicly available for viewing and reference. Contributions may be proposed through GitHub issues or pull requests.',
                       ),
                       const SizedBox(height: 8),
                       Row(

@@ -119,7 +119,7 @@ class ContactPage extends StatelessWidget {
                           icon: Icons.code_rounded,
                           title: 'Source Code',
                           subtitle:
-                              'Explore the open-source repository and contributing guidelines.',
+                              'Explore the project repository and contributing guidelines.',
                           actionLabel: 'View Repository',
                           url: _githubRepoUrl,
                         ),
@@ -156,7 +156,7 @@ class ContactPage extends StatelessWidget {
                             icon: Icons.code_rounded,
                             title: 'Source Code',
                             subtitle:
-                                'Explore the open-source repository and contributing guidelines.',
+                                'Explore the project repository and contributing guidelines.',
                             actionLabel: 'View Repository',
                             url: _githubRepoUrl,
                           ),

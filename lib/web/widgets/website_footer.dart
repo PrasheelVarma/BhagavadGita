@@ -254,7 +254,7 @@ class WebsiteFooter extends StatelessWidget {
       runSpacing: 8,
       children: [
         Text(
-          '© ${DateTime.now().year} Bhagavad Gita Project • Open Source',
+          '© ${DateTime.now().year} Bhagavad Gita Project',
           style: TextStyle(
             fontSize: 13,
             color: Colors.white.withValues(alpha: 0.4),
