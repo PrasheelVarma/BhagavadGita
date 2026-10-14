@@ -67,26 +67,31 @@ class WebsiteHeader extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 36,
-              height: 36,
+              width: 44,
+              height: 44,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: GitaColors.gold, width: 2),
+                gradient: const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    GitaColors.vermillion,
+                    GitaColors.crimson,
+                  ],
+                ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.08),
+                    color: GitaColors.crimson.withValues(alpha: 0.22),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
                 ],
               ),
-              child: ClipOval(
-                child: Image.asset(
-                  'assets/artwork.png',
-                  width: 36,
-                  height: 36,
-                  fit: BoxFit.cover,
-                ),
+              padding: const EdgeInsets.all(3.5),
+              child: Image.asset(
+                'assets/img2.png',
+                fit: BoxFit.contain,
+                filterQuality: FilterQuality.medium,
               ),
             ),
             const SizedBox(width: 12),

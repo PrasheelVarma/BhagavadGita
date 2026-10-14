@@ -108,19 +108,31 @@ class WebsiteFooter extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 34,
-              height: 34,
+              width: 44,
+              height: 44,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: GitaColors.gold, width: 1.5),
-              ),
-              child: ClipOval(
-                child: Image.asset(
-                  'assets/artwork.png',
-                  width: 34,
-                  height: 34,
-                  fit: BoxFit.cover,
+                gradient: const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    GitaColors.vermillion,
+                    GitaColors.crimson,
+                  ],
                 ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.25),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              padding: const EdgeInsets.all(3.5),
+              child: Image.asset(
+                'assets/img2.png',
+                fit: BoxFit.contain,
+                filterQuality: FilterQuality.medium,
               ),
             ),
             const SizedBox(width: 12),

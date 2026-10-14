@@ -119,46 +119,6 @@ class _HeroSection extends StatelessWidget {
       crossAxisAlignment:
           centered ? CrossAxisAlignment.center : CrossAxisAlignment.start,
       children: [
-        // Badge tag
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            border: Border.all(color: GitaColors.peach, width: 1.2),
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.03),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 7,
-                height: 7,
-                decoration: const BoxDecoration(
-                  color: GitaColors.saffron,
-                  shape: BoxShape.circle,
-                ),
-              ),
-              const SizedBox(width: 8),
-              const Text(
-                'Telugu Recitation • Sri Ghantasala',
-                style: TextStyle(
-                  fontSize: 12.5,
-                  fontWeight: FontWeight.w600,
-                  color: GitaColors.textDark,
-                  letterSpacing: 0.3,
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 20),
         // Main headline
         Text(
           'Bhagavad Gita',
@@ -241,7 +201,6 @@ class _HeroSection extends StatelessWidget {
               height: artSize * 0.88,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: GitaColors.gold, width: 3),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withValues(alpha: 0.14),
