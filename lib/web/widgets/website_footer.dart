@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 import '../theme.dart';
 import '../utils/url_launcher_helper.dart';
 
-/// Clean, restrained website footer.
-/// Provides essential navigation, audio credit, repository links, and copyright.
+/// Clean, dignified website footer.
+/// Deep burgundy background with high-contrast warm typography,
+/// distinct headings, and clear interactive link states.
 class WebsiteFooter extends StatelessWidget {
   final VoidCallback onNavigateHome;
   final VoidCallback onNavigatePlayer;
@@ -19,6 +20,7 @@ class WebsiteFooter extends StatelessWidget {
     required this.onNavigateContact,
   });
 
+  static const String _githubProfileUrl = 'https://github.com/PrasheelVarma';
   static const String _githubRepoUrl =
       'https://github.com/PrasheelVarma/BhagavadGita';
   static const String _androidReleaseUrl =
@@ -38,8 +40,8 @@ class WebsiteFooter extends StatelessWidget {
           constraints: const BoxConstraints(maxWidth: GitaLayout.maxContentWidth),
           child: Padding(
             padding: GitaLayout.responsivePadding(screenWidth).copyWith(
-              top: 40,
-              bottom: 28,
+              top: 44,
+              bottom: 32,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -48,7 +50,7 @@ class WebsiteFooter extends StatelessWidget {
                 const SizedBox(height: 32),
                 Container(
                   height: 1,
-                  color: Colors.white.withValues(alpha: 0.08),
+                  color: Colors.white.withValues(alpha: 0.12),
                 ),
                 const SizedBox(height: 20),
                 _buildBottomRow(isMobile),
@@ -119,7 +121,7 @@ class WebsiteFooter extends StatelessWidget {
             const Text(
               'Bhagavad Gita',
               style: TextStyle(
-                fontSize: 15,
+                fontSize: 16,
                 fontWeight: FontWeight.w700,
                 color: GitaColors.textOnDark,
                 letterSpacing: 0.2,
@@ -128,20 +130,20 @@ class WebsiteFooter extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 12),
-        Text(
+        const Text(
           'A quiet, distraction-free player for the revered Telugu recitation sung by Sri Ghantasala Venkateswara Rao.',
           style: TextStyle(
             fontSize: 13.5,
-            color: Colors.white.withValues(alpha: 0.65),
+            color: Color(0xFFE8DCD0),
             height: 1.5,
           ),
         ),
-        const SizedBox(height: 8),
-        Text(
+        const SizedBox(height: 10),
+        const Text(
           'Full credit is given to Sri Ghantasala Venkateswara Rao. The audio recording remains the property of its respective copyright owners.',
           style: TextStyle(
             fontSize: 12,
-            color: Colors.white.withValues(alpha: 0.45),
+            color: Color(0xFFC7B8AA),
             height: 1.45,
           ),
         ),
@@ -154,13 +156,13 @@ class WebsiteFooter extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const _FooterHeading('Navigation'),
-        const SizedBox(height: 12),
+        const SizedBox(height: 14),
         _FooterLink(label: 'Home', onTap: onNavigateHome),
-        const SizedBox(height: 8),
+        const SizedBox(height: 10),
         _FooterLink(label: 'Player', onTap: onNavigatePlayer),
-        const SizedBox(height: 8),
+        const SizedBox(height: 10),
         _FooterLink(label: 'About', onTap: onNavigateAbout),
-        const SizedBox(height: 8),
+        const SizedBox(height: 10),
         _FooterLink(label: 'Contact', onTap: onNavigateContact),
       ],
     );
@@ -171,17 +173,17 @@ class WebsiteFooter extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const _FooterHeading('Project & Releases'),
-        const SizedBox(height: 12),
+        const SizedBox(height: 14),
         _FooterLink(
           label: 'Android APK Release',
           onTap: () => launchUrlSafely(_androidReleaseUrl),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 10),
         _FooterLink(
           label: 'GitHub Repository',
           onTap: () => launchUrlSafely(_githubRepoUrl),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 10),
         _FooterLink(
           label: 'Issue Tracker & Feedback',
           onTap: () => launchUrlSafely(_githubIssuesUrl),
@@ -199,18 +201,14 @@ class WebsiteFooter extends StatelessWidget {
       children: [
         Text(
           '© ${DateTime.now().year} Bhagavad Gita Project',
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 12.5,
-            color: Colors.white.withValues(alpha: 0.4),
+            color: Color(0xFFB0A090),
           ),
         ),
-        Text(
-          'Maintained by PrasheelVarma',
-          style: TextStyle(
-            fontSize: 12.5,
-            fontWeight: FontWeight.w500,
-            color: Colors.white.withValues(alpha: 0.55),
-          ),
+        _FooterLink(
+          label: 'Maintained by PrasheelVarma on GitHub',
+          onTap: () => launchUrlSafely(_githubProfileUrl),
         ),
       ],
     );
@@ -225,11 +223,11 @@ class _FooterHeading extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text,
-      style: TextStyle(
-        fontSize: 11.5,
+      style: const TextStyle(
+        fontSize: 12,
         fontWeight: FontWeight.w700,
-        color: Colors.white.withValues(alpha: 0.45),
-        letterSpacing: 1.0,
+        color: Color(0xFFE5C158),
+        letterSpacing: 0.8,
       ),
     );
   }
@@ -262,8 +260,10 @@ class _FooterLinkState extends State<_FooterLink> {
             fontSize: 13.5,
             fontWeight: FontWeight.w500,
             color: _isHovered
-                ? Colors.white
-                : Colors.white.withValues(alpha: 0.7),
+                ? const Color(0xFFFFD54F)
+                : const Color(0xFFEDE4D8),
+            decoration: _isHovered ? TextDecoration.underline : null,
+            decorationColor: const Color(0xFFFFD54F),
           ),
         ),
       ),

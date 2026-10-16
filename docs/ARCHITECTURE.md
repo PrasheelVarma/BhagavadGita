@@ -40,9 +40,9 @@ The Bhagavad Gita Audio Player is engineered as a zero-dependency, distraction-f
 ### Core Architecture Principles
 
 1. **Self-Contained Offline Integrity (Android):** The complete 73-minute recitation is packaged as a bundled asset (`assets/audio.m4a`). Playback does not depend on external content delivery networks (CDNs), streaming servers, or network sockets.
-2. **Zero Telemetry & Absolute Privacy:** The codebase contains no advertising SDKs, tracking pixels, device fingerprinting, or user analytics. No user accounts or authentication barriers exist.
+2. **Distraction-Free Architecture:** The codebase contains no advertising SDKs, commercial interruptions, or user account barriers. Playback is accessible immediately without registration.
 3. **Dual Scrubbing Mathematics:** Seek operations are supported through both a radial dial scrubber (mapped via polar coordinates $[-\pi, \pi]$ around the artwork) and a synchronized linear progress bar.
-4. **Persistent Playback During Web Navigation:** On the web target, the `AudioPlayerController` resides in the root `WebsiteApp` state, persisting audio streams seamlessly while the user navigates between Home, Product Specs, Downloads, Chapter Index, About, and Contact pages.
+4. **Persistent Playback During Web Navigation:** On the web target, the `AudioPlayerController` resides in the root `WebsiteApp` state, persisting audio streams seamlessly while the user navigates between Home, Player, About, and Contact views.
 
 ---
 

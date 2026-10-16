@@ -129,7 +129,7 @@ class AboutPage extends StatelessWidget {
                       ),
                       const _Paragraph(
                         'This project eliminates those distractions entirely. It requires no user account, '
-                        'carries no advertisements, and runs without tracking telemetry.',
+                        'carries no commercial advertisements, and allows immediate, peaceful listening.',
                       ),
                     ],
                   ),

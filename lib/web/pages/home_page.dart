@@ -246,20 +246,16 @@ class _HeroSection extends StatelessWidget {
                 ],
               ),
             ),
-            // Double-ring framed circular artwork
+            // Clean circular artwork with subtle elevation shadow
             Container(
               width: artSize * 0.88,
               height: artSize * 0.88,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(
-                  color: GitaColors.antiqueGold,
-                  width: 2.5,
-                ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.14),
-                    blurRadius: 22,
+                    color: Colors.black.withValues(alpha: 0.15),
+                    blurRadius: 24,
                     offset: const Offset(0, 8),
                   ),
                 ],
@@ -315,7 +311,7 @@ class _ListeningOptionsSection extends StatelessWidget {
                   eyebrow: 'WAYS TO LISTEN',
                   title: 'Web Player vs. Android App',
                   subtitle:
-                      'Both options share the same pure, distraction-free listening experience, tailored for their respective environments.',
+                      'Choose the Web Player for instant in-browser listening without installation, or download the native Android APK for completely offline listening with lock-screen and background playback.',
                   isMobile: _isMobile,
                 ),
                 const SizedBox(height: 32),
@@ -640,7 +636,7 @@ class _ListeningFeaturesSection extends StatelessWidget {
       icon: Icons.spa_outlined,
       title: 'Distraction-Free Devotion',
       description:
-          'Dedicated strictly to listening. No commercial advertisements, no sign-in or account setup, and zero tracking analytics to disrupt your focus.',
+          'Dedicated strictly to listening. No commercial advertisements, no sign-in or account registration required, keeping your focus on the sacred discourse.',
     ),
   ];
 }

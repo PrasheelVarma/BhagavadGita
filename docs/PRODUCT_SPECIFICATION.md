@@ -13,7 +13,7 @@ The Bhagavad Gita Audio Player is a dedicated, distraction-free player for the r
 The application is built to provide an uninterrupted listening experience:
 1. **Distraction-Free:** Dedicated strictly to this recording, without commercial advertisements, social feeds, or recommendation algorithms.
 2. **Offline Android Playback:** The Android release packages the audio file (`assets/audio.m4a`) directly into the APK, enabling playback without network access.
-3. **Privacy-Conscious:** Requires no user account, login flows, or telemetry tracking SDKs.
+3. **Account-Free Access:** Requires no user registration, account sign-in, or login flows.
 
 ---
 
