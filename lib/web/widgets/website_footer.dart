@@ -213,11 +213,16 @@ class WebsiteFooter extends StatelessWidget {
     );
   }
 
+  static const String _githubDocsUrl =
+      'https://github.com/PrasheelVarma/BhagavadGita/tree/main/docs';
+  static const String _githubIssuesUrl =
+      'https://github.com/PrasheelVarma/BhagavadGita/issues';
+
   Widget _buildProjectColumn() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const _FooterHeading('Project & Developer'),
+        const _FooterHeading('Project & Docs'),
         const SizedBox(height: 14),
         MouseRegion(
           cursor: SystemMouseCursors.click,
@@ -248,6 +253,16 @@ class WebsiteFooter extends StatelessWidget {
         _FooterLink(
           label: 'GitHub Repository',
           onTap: () => launchUrlSafely(_githubRepoUrl),
+        ),
+        const SizedBox(height: 10),
+        _FooterLink(
+          label: 'System Architecture',
+          onTap: () => launchUrlSafely(_githubDocsUrl),
+        ),
+        const SizedBox(height: 10),
+        _FooterLink(
+          label: 'Issue Tracker & Feedback',
+          onTap: () => launchUrlSafely(_githubIssuesUrl),
         ),
         const SizedBox(height: 10),
         _FooterLink(

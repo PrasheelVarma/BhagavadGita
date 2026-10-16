@@ -36,6 +36,14 @@ abstract final class GitaColors {
   static const statusActiveBg = Color(0xFFE8F5E9);
   static const statusPlanned = Color(0xFF757575);
   static const statusPlannedBg = Color(0xFFF5F5F5);
+
+  // Surface & Borders
+  static const surfaceBorder = Color(0xFFE8DFD5);
+  static const surfaceCard = Color(0xFFFFFFFF);
+  static const surfaceSubtle = Color(0xFFF8F5F0);
+  static const goldAccent = Color(0xFFD4A017);
+  static const tagBorder = Color(0xFFE5D5C5);
+  static const darkBorder = Color(0x33FFD54F);
 }
 
 /// Reusable text styles for the website.

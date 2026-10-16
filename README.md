@@ -65,24 +65,28 @@ The complete audio track is bundled directly within the app assets (`assets/audi
 ## Project Structure
 
 ```
-lib/
-├── main.dart                          # App entry point, orientation lock & platform routing
-├── screens/
-│   ├── player_screen.dart             # Mobile audio player screen with dial & controls
-│   └── splash_screen.dart             # Startup splash screen
-├── services/
-│   └── audio_player_controller.dart   # Audio state management, session lifecycle & playback logic
-└── web/
-    ├── pages/
-    │   ├── about_page.dart            # Project information & rendition background
-    │   ├── contact_page.dart          # Project links & developer info
-    │   ├── home_page.dart             # Landing page & download links
-    │   └── player_page.dart           # Web-optimized audio player wrapper
-    ├── theme.dart                     # Web design tokens, typography & color palette
-    ├── website_app.dart               # Responsive web application shell & navigation
-    └── widgets/
-        ├── website_footer.dart        # Reusable web footer
-        └── website_header.dart        # Responsive navigation header
+BhagavadGita/
+├── docs/                              # System documentation & technical specifications
+│   ├── ARCHITECTURE.md                # System architecture, state machine & math design
+│   └── PRODUCT_SPECIFICATION.md       # Product capabilities, audio provenance & specs
+├── lib/
+│   ├── main.dart                      # App entry point, orientation lock & platform routing
+│   ├── screens/
+│   │   ├── player_screen.dart         # Mobile audio player screen with dial & controls
+│   │   └── splash_screen.dart         # Startup splash screen
+│   ├── services/
+│   │   └── audio_player_controller.dart # Audio state management, session lifecycle & playback logic
+│   └── web/
+│       ├── pages/
+│       │   ├── about_page.dart        # Project information & rendition background
+│       │   ├── contact_page.dart      # Project links & developer info
+│       │   ├── home_page.dart         # Spacedesk-standard product portal & download grid
+│       │   └── player_page.dart       # Web-optimized audio player wrapper
+│       ├── theme.dart                 # Web design tokens, typography & color palette
+│       ├── website_app.dart           # Responsive web application shell & navigation
+│       └── widgets/
+│           ├── website_footer.dart    # Reusable web footer with sitemap & copyright
+│           └── website_header.dart    # Sticky glassmorphic navigation header
 ```
 
 ---
