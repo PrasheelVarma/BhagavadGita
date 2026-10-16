@@ -80,13 +80,13 @@ BhagavadGita/
 │       ├── pages/
 │       │   ├── about_page.dart        # Project information & rendition background
 │       │   ├── contact_page.dart      # Project links & developer info
-│       │   ├── home_page.dart         # Spacedesk-standard product portal & download grid
+│       │   ├── home_page.dart         # Landing page, listening overview & download access
 │       │   └── player_page.dart       # Web-optimized audio player wrapper
 │       ├── theme.dart                 # Web design tokens, typography & color palette
 │       ├── website_app.dart           # Responsive web application shell & navigation
 │       └── widgets/
 │           ├── website_footer.dart    # Reusable web footer with sitemap & copyright
-│           └── website_header.dart    # Sticky glassmorphic navigation header
+│           └── website_header.dart    # Clean navigation header
 ```
 
 ---

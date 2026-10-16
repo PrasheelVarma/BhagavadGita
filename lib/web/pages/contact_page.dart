@@ -4,6 +4,7 @@ import '../theme.dart';
 import '../utils/url_launcher_helper.dart';
 
 /// Contact and Project Info page.
+/// Provides honest feedback paths, issue reporting, and clear repository terms.
 class ContactPage extends StatelessWidget {
   const ContactPage({super.key});
 
@@ -33,37 +34,45 @@ class ContactPage extends StatelessWidget {
     return Container(
       width: double.infinity,
       decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [GitaColors.ivory, GitaColors.cream],
+        color: GitaColors.warmWhite,
+        border: Border(
+          bottom: BorderSide(
+            color: GitaColors.surfaceBorder,
+            width: 1,
+          ),
         ),
       ),
       child: Center(
         child: ConstrainedBox(
-          constraints:
-              const BoxConstraints(maxWidth: GitaLayout.maxContentWidth + 96),
+          constraints: const BoxConstraints(maxWidth: GitaLayout.maxContentWidth),
           child: Padding(
             padding: GitaLayout.responsivePadding(screenWidth).copyWith(
-              top: isMobile ? 44 : 64,
-              bottom: isMobile ? 36 : 56,
+              top: isMobile ? 36 : 52,
+              bottom: isMobile ? 32 : 44,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                const Text(
+                  'GET IN TOUCH',
+                  style: GitaTextStyles.eyebrow,
+                ),
+                const SizedBox(height: 10),
                 Text(
                   'Contact & Feedback',
                   style: GitaTextStyles.sectionHeading.copyWith(
-                    fontSize: isMobile ? 28 : 36,
+                    fontSize: isMobile ? 26 : 34,
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 8),
                 ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 620),
+                  constraints: const BoxConstraints(maxWidth: 640),
                   child: Text(
-                    'Questions, issue reports, or suggestions regarding the Bhagavad Gita website and Android application.',
-                    style: GitaTextStyles.sectionSubheading.copyWith(
-                      fontSize: isMobile ? 15 : 17,
+                    'Questions, defect reports, or suggestions regarding the Bhagavad Gita player.',
+                    style: TextStyle(
+                      fontSize: isMobile ? 14.5 : 16,
+                      color: GitaColors.textMedium,
+                      height: 1.5,
                     ),
                   ),
                 ),
@@ -78,50 +87,49 @@ class ContactPage extends StatelessWidget {
   Widget _buildContent(bool isMobile, double screenWidth) {
     return Container(
       width: double.infinity,
-      color: GitaColors.pureWhite,
+      color: GitaColors.linen,
       child: Center(
         child: ConstrainedBox(
-          constraints:
-              const BoxConstraints(maxWidth: GitaLayout.maxContentWidth + 96),
+          constraints: const BoxConstraints(maxWidth: GitaLayout.maxContentWidth),
           child: Padding(
             padding: GitaLayout.responsivePadding(screenWidth).copyWith(
-              top: 48,
+              top: 40,
               bottom: 48,
             ),
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 820),
+              constraints: const BoxConstraints(maxWidth: 780),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Contact Grid / Cards
+                  // Contact Cards (Developer, Issue Tracker, Repository)
                   if (isMobile)
                     Column(
                       children: [
                         _buildContactCard(
-                          icon: Icons.person_rounded,
-                          title: 'Developer',
-                          subtitle:
-                              'Maintained and developed by PrasheelVarma on GitHub.',
-                          actionLabel: 'GitHub Profile',
-                          url: _githubProfileUrl,
-                        ),
-                        const SizedBox(height: 20),
-                        _buildContactCard(
-                          icon: Icons.bug_report_rounded,
+                          icon: Icons.bug_report_outlined,
                           title: 'Issue Tracker',
                           subtitle:
-                              'Report bugs, audio playback issues, or UI defects on GitHub.',
-                          actionLabel: 'Open Issues',
+                              'Report playback defects, browser-specific issues, or audio anomalies directly on GitHub.',
+                          actionLabel: 'Open GitHub Issues',
                           url: _githubIssuesUrl,
                         ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 16),
                         _buildContactCard(
                           icon: Icons.code_rounded,
                           title: 'Source Code',
                           subtitle:
-                              'Explore the project repository and contributing guidelines.',
+                              'View the repository structure, documentation, and commit history.',
                           actionLabel: 'View Repository',
                           url: _githubRepoUrl,
+                        ),
+                        const SizedBox(height: 16),
+                        _buildContactCard(
+                          icon: Icons.person_outline_rounded,
+                          title: 'Maintainer',
+                          subtitle:
+                              'Developed and maintained by PrasheelVarma on GitHub.',
+                          actionLabel: 'GitHub Profile',
+                          url: _githubProfileUrl,
                         ),
                       ],
                     )
@@ -131,52 +139,59 @@ class ContactPage extends StatelessWidget {
                       children: [
                         Expanded(
                           child: _buildContactCard(
-                            icon: Icons.person_rounded,
-                            title: 'Developer',
-                            subtitle:
-                                'Maintained and developed by PrasheelVarma on GitHub.',
-                            actionLabel: 'GitHub Profile',
-                            url: _githubProfileUrl,
-                          ),
-                        ),
-                        const SizedBox(width: 24),
-                        Expanded(
-                          child: _buildContactCard(
-                            icon: Icons.bug_report_rounded,
+                            icon: Icons.bug_report_outlined,
                             title: 'Issue Tracker',
                             subtitle:
-                                'Report bugs, audio playback issues, or UI defects on GitHub.',
+                                'Report playback defects, browser-specific issues, or audio anomalies.',
                             actionLabel: 'Open Issues',
                             url: _githubIssuesUrl,
                           ),
                         ),
-                        const SizedBox(width: 24),
+                        const SizedBox(width: 18),
                         Expanded(
                           child: _buildContactCard(
                             icon: Icons.code_rounded,
                             title: 'Source Code',
                             subtitle:
-                                'Explore the project repository and contributing guidelines.',
+                                'View the repository structure, documentation, and commit history.',
                             actionLabel: 'View Repository',
                             url: _githubRepoUrl,
+                          ),
+                        ),
+                        const SizedBox(width: 18),
+                        Expanded(
+                          child: _buildContactCard(
+                            icon: Icons.person_outline_rounded,
+                            title: 'Maintainer',
+                            subtitle:
+                                'Developed and maintained by PrasheelVarma on GitHub.',
+                            actionLabel: 'GitHub Profile',
+                            url: _githubProfileUrl,
                           ),
                         ),
                       ],
                     ),
 
-                  const SizedBox(height: 48),
+                  const SizedBox(height: 36),
 
-                  // Feedback Guidelines Card
+                  // Feedback & Contribution Terms Card
                   Container(
                     width: double.infinity,
-                    padding: EdgeInsets.all(isMobile ? 24 : 32),
+                    padding: const EdgeInsets.all(22),
                     decoration: BoxDecoration(
-                      color: GitaColors.ivory.withValues(alpha: 0.6),
-                      borderRadius: BorderRadius.circular(16),
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(14),
                       border: Border.all(
-                        color: GitaColors.peach.withValues(alpha: 0.7),
-                        width: 1,
+                        color: GitaColors.surfaceBorder,
+                        width: 1.2,
                       ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.025),
+                          blurRadius: 12,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
                     ),
                     child: const Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -185,29 +200,37 @@ class ContactPage extends StatelessWidget {
                           children: [
                             Icon(
                               Icons.info_outline_rounded,
-                              size: 22,
+                              size: 19,
                               color: GitaColors.crimson,
                             ),
-                            SizedBox(width: 12),
+                            SizedBox(width: 10),
                             Text(
-                              'Feedback & Contributions',
+                              'Feedback & Contribution Terms',
                               style: TextStyle(
-                                fontSize: 18,
+                                fontSize: 16,
                                 fontWeight: FontWeight.w700,
                                 color: GitaColors.textDark,
                               ),
                             ),
                           ],
                         ),
-                        SizedBox(height: 14),
-                        Text(
-                          'If you encounter playback anomalies on specific browsers or Android versions, or have suggestions for the devotional player controls, opening a GitHub issue with your device and browser specifications is the most direct way to get it resolved.',
-                          style: GitaTextStyles.bodyText,
-                        ),
                         SizedBox(height: 12),
                         Text(
-                          'All code and documentation contributions are welcomed through pull requests on the main GitHub repository.',
-                          style: GitaTextStyles.bodyText,
+                          'If you encounter audio playback issues on specific Android device models or web browsers, opening a GitHub issue with device and browser details is the best way to help improve the project.',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: GitaColors.textMedium,
+                            height: 1.55,
+                          ),
+                        ),
+                        SizedBox(height: 10),
+                        Text(
+                          'Code contributions may be proposed through GitHub pull requests. Note that this repository is available for public viewing and reference; no license is granted for independent source code redistribution, commercial use, or re-publication.',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: GitaColors.textMedium,
+                            height: 1.55,
+                          ),
                         ),
                       ],
                     ),
@@ -229,19 +252,19 @@ class ContactPage extends StatelessWidget {
     required String url,
   }) {
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: const Color(0xFFEADBCE),
-          width: 1,
+          color: GitaColors.surfaceBorder,
+          width: 1.2,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 16,
-            offset: const Offset(0, 4),
+            color: Colors.black.withValues(alpha: 0.025),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
           ),
         ],
       ),
@@ -249,101 +272,60 @@ class ContactPage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: 44,
-            height: 44,
+            width: 40,
+            height: 40,
             decoration: BoxDecoration(
               color: GitaColors.ivory,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: GitaColors.peach.withValues(alpha: 0.8),
-                width: 1,
-              ),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: GitaColors.peach, width: 0.8),
             ),
-            child: Icon(icon, color: GitaColors.crimson, size: 22),
+            child: Icon(icon, color: GitaColors.crimson, size: 20),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
           Text(
             title,
             style: const TextStyle(
-              fontSize: 18,
+              fontSize: 16,
               fontWeight: FontWeight.w700,
               color: GitaColors.textDark,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
           Text(
             subtitle,
-            style: TextStyle(
-              fontSize: 14,
-              color: GitaColors.textMedium.withValues(alpha: 0.9),
-              height: 1.5,
+            style: const TextStyle(
+              fontSize: 13,
+              color: GitaColors.textMedium,
+              height: 1.45,
             ),
           ),
-          const SizedBox(height: 20),
-          _ActionButton(
-            label: actionLabel,
-            onTap: () => launchUrlSafely(url),
+          const SizedBox(height: 16),
+          MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: GestureDetector(
+              onTap: () => launchUrlSafely(url),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    actionLabel,
+                    style: const TextStyle(
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w700,
+                      color: GitaColors.crimson,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  const Icon(
+                    Icons.open_in_new_rounded,
+                    size: 13,
+                    color: GitaColors.crimson,
+                  ),
+                ],
+              ),
+            ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _ActionButton extends StatefulWidget {
-  final String label;
-  final VoidCallback onTap;
-
-  const _ActionButton({required this.label, required this.onTap});
-
-  @override
-  State<_ActionButton> createState() => _ActionButtonState();
-}
-
-class _ActionButtonState extends State<_ActionButton> {
-  bool _isHovered = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
-      child: GestureDetector(
-        onTap: widget.onTap,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 180),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          decoration: BoxDecoration(
-            color: _isHovered
-                ? GitaColors.red.withValues(alpha: 0.1)
-                : GitaColors.ivory,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: _isHovered ? GitaColors.red : GitaColors.peach,
-              width: 1,
-            ),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                widget.label,
-                style: TextStyle(
-                  fontSize: 13.5,
-                  fontWeight: FontWeight.w600,
-                  color: _isHovered ? GitaColors.red : GitaColors.crimson,
-                ),
-              ),
-              const SizedBox(width: 6),
-              Icon(
-                Icons.open_in_new_rounded,
-                size: 14,
-                color: _isHovered ? GitaColors.red : GitaColors.crimson,
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }

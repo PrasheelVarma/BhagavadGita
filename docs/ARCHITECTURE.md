@@ -24,9 +24,9 @@ The Bhagavad Gita Audio Player is engineered as a zero-dependency, distraction-f
         |      Android Native Target      |                     |        Web Client Target        |
         +---------------------------------+                     +---------------------------------+
         | - Bundled Offline Asset (27MB)  |                     | - Responsive Web Presentation   |
-        | - Foreground Audio Service      |                     | - Spacedesk-Class Product Site  |
+        | - Foreground Audio Service      |                     | - Restrained Devotional Web UI  |
         | - Lockscreen & Notification     |                     | - Instant In-Browser Player     |
-        | - Audio Session / Focus Mgmt    |                     | - Platform Matrix & Downloads   |
+        | - Audio Session / Focus Mgmt    |                     | - Direct Listening & Downloads  |
         | - Direct Player Lifecycle       |                     | - Persistent State Controller   |
         +---------------------------------+                     +---------------------------------+
                          |                                                       |
@@ -185,52 +185,40 @@ The centerpiece of `PlayerScreen` is the circular dial surrounding `assets/artwo
 
 ---
 
-## 5. Public Website Architecture (Spacedesk Reference Standard)
+## 5. Public Website Architecture
 
-To match professional software distribution portals (such as Spacedesk by DATRONICSOFT, OBS Studio, and VLC), the web frontend is structured around structured information density, verifiable technical details, and direct access.
+The web frontend is designed as a calm, distraction-free devotional listening environment. It provides direct listening in modern browsers, download access to the standalone Android APK, and essential project attribution.
 
 ### 5.1 Page & Section Organization
 
 ```
-[ Sticky Glassmorphic Header: Brand, Live Version Badge, Navigation, CTA ]
+[ Navigation Header: Logo, Title, Navigation (Home, Player, About, Contact) ]
   │
-  ├── 1. Hero Section
-  │      ├── Value Proposition Headline & Subtitle
-  │      ├── Dual Primary CTAs: "Launch Web Player" & "Download APK v1.0"
-  │      ├── Verified Metadata Badges: Standalone Offline, No Ads, Zero Tracking
-  │      └── Interactive Framed Artwork Showcase
+  ├── 1. Home Page
+  │      ├── Hero Section: Clear Introduction, Reverent Artwork & Dual CTAs
+  │      ├── Platform Overview: In-Browser Web Stream vs. 100% Offline Android APK
+  │      └── Listening Highlights: Offline Android, Dual Scrubber & Ad-Free Focus
   │
-  ├── 2. Platform Matrix & Distribution Center (Spacedesk-Style Grid)
-  │      ├── Android Native (Available: Direct APK v1.0, 27MB, API 21+)
-  │      ├── Web Application (Available: HTML5 Zero-Install PWA)
-  │      ├── Windows Desktop (Planned: Multiplatform Flutter engine)
-  │      └── Linux & macOS (Planned: Native binary packages)
+  ├── 2. Player Page
+  │      ├── Audio Playback Screen (Centered Desktop Frame / Native Mobile Viewport)
+  │      └── Dual Radial Dial & Synchronized Linear Timeline
   │
-  ├── 3. Feature Showcase & Technical Comparison Matrix
-  │      ├── Web Player vs Android Native Side-by-Side Specifications
-  │      ├── Dual Seek Scrubber (Radial Dial + Linear Bar)
-  │      ├── Sleep Timer & Playback Rate Engine
-  │      └── Background Notification & Audio Focus Lifecycle
+  ├── 3. About Page
+  │      ├── Devotional Purpose & Cultural Background
+  │      ├── Web vs. Android Platform Comparison
+  │      ├── Educational Guide to the 18 Chapters (Sanskrit, Telugu, Themes)
+  │      ├── Vocalist Attribution (Sri Ghantasala Venkateswara Rao) & Copyright Notice
+  │      └── Technology & Repository Terms
   │
-  ├── 4. Sacred Recitation Heritage & 18 Chapters Index
-  │      ├── Sri Ghantasala Venkateswara Rao Biography & Artistic Context
-  │      ├── Complete 18 Chapters Guide with Timestamps & Discourse Topics
-  │      └── Devotional Preservation Ethics
+  ├── 4. Contact Page
+  │      ├── Feedback & Defect Reporting via GitHub Issues
+  │      ├── Maintainer & Source Repository Reference
+  │      └── Code Usage & Contribution Policy
   │
-  ├── 5. Technical Specifications & Integrity Guarantee
-  │      ├── Audio Encoding: AAC in M4A container, 44.1 kHz, 16-bit stereo
-  │      ├── Performance: Zero background network requests, minimal battery draw
-  │      └── Security: SHA-256 Checksums, No Root Required, Safe Sideloading
-  │
-  ├── 6. Frequently Asked Questions (FAQ) & Troubleshooting
-  │      ├── Installation Guide for Android (Unknown sources toggle)
-  │      ├── Battery optimization exclusion tips
-  │      └── Browser compatibility notes
-  │
-  └── 7. Professional Footer
-         ├── Deep Sitemap (Navigation, Platforms, Documentation, Legal)
-         ├── Developer Credentials (PrasheelVarma)
-         └── Cultural Attribution & Copyright Disclaimers
+  └── 5. Footer
+         ├── Cultural Attribution & Non-Ownership Disclaimer
+         ├── Clean Navigation Sitemap
+         └── Repository & Release Links
 ```
 
 ### 5.2 Responsive Breakpoint Strategy
@@ -239,9 +227,9 @@ Defined in `lib/web/theme.dart`:
 
 | Breakpoint | Viewport Width | Layout Behavior |
 |---|---|---|
-| **Desktop / Wide** | $> 900\text{ px}$ | Two-column hero, 4-column platform grid, side-by-side feature comparison, horizontal navbar. |
-| **Tablet** | $600\text{ px} - 900\text{ px}$ | Centered hero, 2x2 platform grid, stacked comparison cards, condensed horizontal navbar. |
-| **Mobile** | $< 600\text{ px}$ | Single-column stacked layout, full-width touch buttons, popup menu drawer, full-bleed player. |
+| **Desktop / Wide** | $> 900\text{ px}$ | Two-column hero, side-by-side comparison cards, 3-column features, horizontal navbar. |
+| **Tablet** | $600\text{ px} - 900\text{ px}$ | Centered hero, stacked comparison cards, condensed horizontal navbar. |
+| **Mobile** | $< 600\text{ px}$ | Single-column stacked layout, full-width touch buttons, popup menu, full-bleed player. |
 
 ---
 

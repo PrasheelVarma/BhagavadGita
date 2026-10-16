@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import '../theme.dart';
 import '../utils/url_launcher_helper.dart';
 
-/// Website footer — clean, professional, and informative.
+/// Clean, restrained website footer.
+/// Provides essential navigation, audio credit, repository links, and copyright.
 class WebsiteFooter extends StatelessWidget {
   final VoidCallback onNavigateHome;
   final VoidCallback onNavigatePlayer;
@@ -18,11 +19,12 @@ class WebsiteFooter extends StatelessWidget {
     required this.onNavigateContact,
   });
 
-  static const String _githubProfileUrl = 'https://github.com/PrasheelVarma';
   static const String _githubRepoUrl =
       'https://github.com/PrasheelVarma/BhagavadGita';
   static const String _androidReleaseUrl =
       'https://github.com/PrasheelVarma/BhagavadGita/releases/tag/v1.0-android';
+  static const String _githubIssuesUrl =
+      'https://github.com/PrasheelVarma/BhagavadGita/issues';
 
   @override
   Widget build(BuildContext context) {
@@ -33,25 +35,22 @@ class WebsiteFooter extends StatelessWidget {
       color: GitaColors.darkBg,
       child: Center(
         child: ConstrainedBox(
-          constraints:
-              const BoxConstraints(maxWidth: GitaLayout.maxContentWidth + 96),
+          constraints: const BoxConstraints(maxWidth: GitaLayout.maxContentWidth),
           child: Padding(
             padding: GitaLayout.responsivePadding(screenWidth).copyWith(
-              top: 48,
-              bottom: 32,
+              top: 40,
+              bottom: 28,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 if (isMobile) _buildMobileLayout() else _buildDesktopLayout(),
-                const SizedBox(height: 40),
-                // Divider
+                const SizedBox(height: 32),
                 Container(
                   height: 1,
-                  color: Colors.white.withValues(alpha: 0.1),
+                  color: Colors.white.withValues(alpha: 0.08),
                 ),
-                const SizedBox(height: 24),
-                // Bottom row
+                const SizedBox(height: 20),
                 _buildBottomRow(isMobile),
               ],
             ),
@@ -65,17 +64,14 @@ class WebsiteFooter extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Brand & Audio info column
-        Expanded(flex: 3, child: _buildBrandColumn()),
+        // Brand & Cultural Attribution
+        Expanded(flex: 5, child: _buildBrandColumn()),
         const SizedBox(width: 48),
-        // Navigation column
-        Expanded(flex: 2, child: _buildNavColumn()),
-        const SizedBox(width: 48),
-        // Platform column
-        Expanded(flex: 2, child: _buildPlatformColumn()),
-        const SizedBox(width: 48),
-        // Project column
-        Expanded(flex: 3, child: _buildProjectColumn()),
+        // Navigation links
+        Expanded(flex: 3, child: _buildNavColumn()),
+        const SizedBox(width: 32),
+        // Project & Release links
+        Expanded(flex: 4, child: _buildProjectColumn()),
       ],
     );
   }
@@ -85,17 +81,15 @@ class WebsiteFooter extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildBrandColumn(),
-        const SizedBox(height: 32),
-        Wrap(
-          spacing: 32,
-          runSpacing: 24,
+        const SizedBox(height: 28),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(width: 140, child: _buildNavColumn()),
-            SizedBox(width: 160, child: _buildPlatformColumn()),
+            Expanded(child: _buildNavColumn()),
+            const SizedBox(width: 20),
+            Expanded(child: _buildProjectColumn()),
           ],
         ),
-        const SizedBox(height: 32),
-        _buildProjectColumn(),
       ],
     );
   }
@@ -108,61 +102,47 @@ class WebsiteFooter extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
+              width: 32,
+              height: 32,
+              decoration: const BoxDecoration(
                 shape: BoxShape.circle,
-                gradient: const LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    GitaColors.vermillion,
-                    GitaColors.crimson,
-                  ],
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.25),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
+                color: GitaColors.crimson,
               ),
-              padding: const EdgeInsets.all(3.5),
+              padding: const EdgeInsets.all(2.5),
               child: Image.asset(
                 'assets/img2.png',
                 fit: BoxFit.contain,
                 filterQuality: FilterQuality.medium,
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 10),
             const Text(
               'Bhagavad Gita',
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 15,
                 fontWeight: FontWeight.w700,
                 color: GitaColors.textOnDark,
-                letterSpacing: 0.3,
+                letterSpacing: 0.2,
               ),
             ),
           ],
         ),
-        const SizedBox(height: 14),
+        const SizedBox(height: 12),
         Text(
-          'Revered Telugu rendition sung by Sri Ghantasala Venkateswara Rao.',
+          'A quiet, distraction-free player for the revered Telugu recitation sung by Sri Ghantasala Venkateswara Rao.',
           style: TextStyle(
-            fontSize: 14,
+            fontSize: 13.5,
             color: Colors.white.withValues(alpha: 0.65),
             height: 1.5,
           ),
         ),
         const SizedBox(height: 8),
         Text(
-          'Designed as a distraction-free devotional listening experience across Web and Android.',
+          'Full credit is given to Sri Ghantasala Venkateswara Rao. The audio recording remains the property of its respective copyright owners.',
           style: TextStyle(
-            fontSize: 13,
+            fontSize: 12,
             color: Colors.white.withValues(alpha: 0.45),
-            height: 1.5,
+            height: 1.45,
           ),
         ),
       ],
@@ -174,100 +154,37 @@ class WebsiteFooter extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const _FooterHeading('Navigation'),
-        const SizedBox(height: 14),
+        const SizedBox(height: 12),
         _FooterLink(label: 'Home', onTap: onNavigateHome),
-        const SizedBox(height: 10),
+        const SizedBox(height: 8),
         _FooterLink(label: 'Player', onTap: onNavigatePlayer),
-        const SizedBox(height: 10),
+        const SizedBox(height: 8),
         _FooterLink(label: 'About', onTap: onNavigateAbout),
-        const SizedBox(height: 10),
+        const SizedBox(height: 8),
         _FooterLink(label: 'Contact', onTap: onNavigateContact),
       ],
     );
   }
 
-  Widget _buildPlatformColumn() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const _FooterHeading('Availability'),
-        const SizedBox(height: 14),
-        _FooterLink(
-          label: 'Web (Browser)',
-          onTap: onNavigatePlayer,
-        ),
-        const SizedBox(height: 10),
-        _FooterLink(
-          label: 'Android v1.0 (APK)',
-          onTap: () => launchUrlSafely(_androidReleaseUrl),
-        ),
-        const SizedBox(height: 10),
-        Text(
-          'Desktop & iOS (Planned)',
-          style: TextStyle(
-            fontSize: 13,
-            color: Colors.white.withValues(alpha: 0.4),
-          ),
-        ),
-      ],
-    );
-  }
-
-  static const String _githubDocsUrl =
-      'https://github.com/PrasheelVarma/BhagavadGita/tree/main/docs';
-  static const String _githubIssuesUrl =
-      'https://github.com/PrasheelVarma/BhagavadGita/issues';
-
   Widget _buildProjectColumn() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const _FooterHeading('Project & Docs'),
-        const SizedBox(height: 14),
-        MouseRegion(
-          cursor: SystemMouseCursors.click,
-          child: GestureDetector(
-            onTap: () => launchUrlSafely(_githubProfileUrl),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.person_rounded,
-                  size: 16,
-                  color: GitaColors.gold.withValues(alpha: 0.85),
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  'PrasheelVarma',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: GitaColors.gold.withValues(alpha: 0.9),
-                  ),
-                ),
-              ],
-            ),
-          ),
+        const _FooterHeading('Project & Releases'),
+        const SizedBox(height: 12),
+        _FooterLink(
+          label: 'Android APK Release',
+          onTap: () => launchUrlSafely(_androidReleaseUrl),
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 8),
         _FooterLink(
           label: 'GitHub Repository',
           onTap: () => launchUrlSafely(_githubRepoUrl),
         ),
-        const SizedBox(height: 10),
-        _FooterLink(
-          label: 'System Architecture',
-          onTap: () => launchUrlSafely(_githubDocsUrl),
-        ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 8),
         _FooterLink(
           label: 'Issue Tracker & Feedback',
           onTap: () => launchUrlSafely(_githubIssuesUrl),
-        ),
-        const SizedBox(height: 10),
-        _FooterLink(
-          label: 'Releases & Downloads',
-          onTap: () => launchUrlSafely(_androidReleaseUrl),
         ),
       ],
     );
@@ -283,22 +200,16 @@ class WebsiteFooter extends StatelessWidget {
         Text(
           '© ${DateTime.now().year} Bhagavad Gita Project',
           style: TextStyle(
-            fontSize: 13,
+            fontSize: 12.5,
             color: Colors.white.withValues(alpha: 0.4),
           ),
         ),
-        MouseRegion(
-          cursor: SystemMouseCursors.click,
-          child: GestureDetector(
-            onTap: () => launchUrlSafely(_githubProfileUrl),
-            child: Text(
-              'Developed by PrasheelVarma',
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-                color: Colors.white.withValues(alpha: 0.6),
-              ),
-            ),
+        Text(
+          'Maintained by PrasheelVarma',
+          style: TextStyle(
+            fontSize: 12.5,
+            fontWeight: FontWeight.w500,
+            color: Colors.white.withValues(alpha: 0.55),
           ),
         ),
       ],
@@ -315,10 +226,10 @@ class _FooterHeading extends StatelessWidget {
     return Text(
       text,
       style: TextStyle(
-        fontSize: 12,
+        fontSize: 11.5,
         fontWeight: FontWeight.w700,
         color: Colors.white.withValues(alpha: 0.45),
-        letterSpacing: 1.2,
+        letterSpacing: 1.0,
       ),
     );
   }
@@ -348,10 +259,10 @@ class _FooterLinkState extends State<_FooterLink> {
         child: Text(
           widget.label,
           style: TextStyle(
-            fontSize: 14,
+            fontSize: 13.5,
             fontWeight: FontWeight.w500,
             color: _isHovered
-                ? GitaColors.gold
+                ? Colors.white
                 : Colors.white.withValues(alpha: 0.7),
           ),
         ),

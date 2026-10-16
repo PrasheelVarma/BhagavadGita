@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../theme.dart';
-import '../utils/url_launcher_helper.dart';
 
-/// Website header — professional product sticky navigation bar.
+/// Clean, dignified sticky navigation header for the Bhagavad Gita website.
 class WebsiteHeader extends StatelessWidget {
   final String currentRoute;
   final VoidCallback onNavigateHome;
@@ -20,52 +19,37 @@ class WebsiteHeader extends StatelessWidget {
     required this.onNavigateContact,
   });
 
-  static const String _githubRepoUrl =
-      'https://github.com/PrasheelVarma/BhagavadGita';
-
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth < GitaLayout.mobileBreakpoint;
-    final isPlayer = currentRoute == '/player';
 
     return Container(
       height: GitaLayout.headerHeight,
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.96),
-        border: const Border(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        border: Border(
           bottom: BorderSide(
-            color: Color(0xFFEEE5DB),
+            color: Color(0xFFEBE3D8),
             width: 1,
           ),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
       child: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: GitaLayout.maxContentWidth + 96),
+          constraints: const BoxConstraints(maxWidth: GitaLayout.maxContentWidth),
           child: Padding(
             padding: GitaLayout.responsivePadding(screenWidth),
             child: Row(
               children: [
-                // Logo / Brand
+                // Brand
                 _buildLogo(),
                 const Spacer(),
                 // Navigation
-                if (isMobile) ...[
-                  if (!isPlayer) ...[
-                    _buildQuickPlayButton(),
-                    const SizedBox(width: 8),
-                  ],
-                  _buildMobileMenu(context),
-                ] else
-                  _buildDesktopNav(isPlayer),
+                if (isMobile)
+                  _buildMobileMenu(context)
+                else
+                  _buildDesktopNav(),
               ],
             ),
           ),
@@ -83,27 +67,13 @@ class WebsiteHeader extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 42,
-              height: 42,
-              decoration: BoxDecoration(
+              width: 38,
+              height: 38,
+              decoration: const BoxDecoration(
                 shape: BoxShape.circle,
-                gradient: const LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    GitaColors.vermillion,
-                    GitaColors.crimson,
-                  ],
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: GitaColors.crimson.withValues(alpha: 0.22),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
+                color: GitaColors.crimson,
               ),
-              padding: const EdgeInsets.all(3.5),
+              padding: const EdgeInsets.all(3),
               child: Image.asset(
                 'assets/img2.png',
                 fit: BoxFit.contain,
@@ -115,46 +85,21 @@ class WebsiteHeader extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Text(
-                      'Bhagavad Gita',
-                      style: TextStyle(
-                        fontSize: 16.5,
-                        fontWeight: FontWeight.w800,
-                        color: GitaColors.crimson,
-                        letterSpacing: 0.3,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: GitaColors.ivory,
-                        borderRadius: BorderRadius.circular(6),
-                        border: Border.all(
-                          color: GitaColors.peach,
-                          width: 0.8,
-                        ),
-                      ),
-                      child: const Text(
-                        'v1.0',
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w700,
-                          color: GitaColors.vermillion,
-                        ),
-                      ),
-                    ),
-                  ],
+                const Text(
+                  'Bhagavad Gita',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: GitaColors.crimson,
+                    letterSpacing: 0.2,
+                  ),
                 ),
                 Text(
                   'Telugu • Sri Ghantasala',
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w500,
-                    color: GitaColors.textLight.withValues(alpha: 0.85),
+                    color: GitaColors.textLight.withValues(alpha: 0.9),
                     letterSpacing: 0.2,
                   ),
                 ),
@@ -166,38 +111,7 @@ class WebsiteHeader extends StatelessWidget {
     );
   }
 
-  Widget _buildQuickPlayButton() {
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      child: GestureDetector(
-        onTap: onNavigatePlayer,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-          decoration: BoxDecoration(
-            color: GitaColors.red,
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: const Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.play_arrow_rounded, color: Colors.white, size: 16),
-              SizedBox(width: 4),
-              Text(
-                'Play',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.white,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDesktopNav(bool isPlayer) {
+  Widget _buildDesktopNav() {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -206,88 +120,23 @@ class WebsiteHeader extends StatelessWidget {
           isActive: currentRoute == '/',
           onTap: onNavigateHome,
         ),
-        const SizedBox(width: 24),
+        const SizedBox(width: 28),
         _NavLink(
           label: 'Player',
           isActive: currentRoute == '/player',
           onTap: onNavigatePlayer,
         ),
-        const SizedBox(width: 24),
+        const SizedBox(width: 28),
         _NavLink(
           label: 'About',
           isActive: currentRoute == '/about',
           onTap: onNavigateAbout,
         ),
-        const SizedBox(width: 24),
+        const SizedBox(width: 28),
         _NavLink(
           label: 'Contact',
           isActive: currentRoute == '/contact',
           onTap: onNavigateContact,
-        ),
-        const SizedBox(width: 24),
-        // Action Button: Open Player (if on other pages)
-        if (!isPlayer) ...[
-          MouseRegion(
-            cursor: SystemMouseCursors.click,
-            child: GestureDetector(
-              onTap: onNavigatePlayer,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [GitaColors.red, GitaColors.crimson],
-                  ),
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: GitaColors.red.withValues(alpha: 0.25),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.play_arrow_rounded, color: Colors.white, size: 18),
-                    SizedBox(width: 6),
-                    Text(
-                      'Launch Player',
-                      style: TextStyle(
-                        fontSize: 13.5,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 14),
-        ],
-        // GitHub Repository icon button
-        MouseRegion(
-          cursor: SystemMouseCursors.click,
-          child: GestureDetector(
-            onTap: () => launchUrlSafely(_githubRepoUrl),
-            child: Container(
-              padding: const EdgeInsets.all(7),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF7F4EE),
-                borderRadius: BorderRadius.circular(18),
-                border: Border.all(
-                  color: const Color(0xFFE4DAD0),
-                  width: 1,
-                ),
-              ),
-              child: const Icon(
-                Icons.code_rounded,
-                size: 18,
-                color: GitaColors.textDark,
-              ),
-            ),
-          ),
         ),
       ],
     );
@@ -297,9 +146,9 @@ class WebsiteHeader extends StatelessWidget {
     return PopupMenuButton<String>(
       icon: const Icon(Icons.menu_rounded, color: GitaColors.textDark, size: 24),
       offset: const Offset(0, GitaLayout.headerHeight - 8),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       color: Colors.white,
-      elevation: 8,
+      elevation: 4,
       onSelected: (value) {
         switch (value) {
           case '/':
@@ -331,7 +180,7 @@ class WebsiteHeader extends StatelessWidget {
       child: Text(
         label,
         style: TextStyle(
-          fontSize: 15,
+          fontSize: 14.5,
           fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
           color: isActive ? GitaColors.crimson : GitaColors.textDark,
         ),
@@ -340,7 +189,7 @@ class WebsiteHeader extends StatelessWidget {
   }
 }
 
-/// Individual navigation link with hover underline effect.
+/// Navigation link with clean active/hover indicators.
 class _NavLink extends StatefulWidget {
   final String label;
   final bool isActive;
@@ -369,33 +218,36 @@ class _NavLinkState extends State<_NavLink> {
       onExit: (_) => setState(() => _isHovered = false),
       child: GestureDetector(
         onTap: widget.onTap,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              widget.label,
-              style: GitaTextStyles.navLink.copyWith(
-                color: widget.isActive
-                    ? GitaColors.crimson
-                    : _isHovered
-                        ? GitaColors.red
-                        : GitaColors.textDark,
-                fontWeight: widget.isActive ? FontWeight.w700 : FontWeight.w500,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                widget.label,
+                style: GitaTextStyles.navLink.copyWith(
+                  color: widget.isActive
+                      ? GitaColors.crimson
+                      : _isHovered
+                          ? GitaColors.crimson
+                          : GitaColors.textDark,
+                  fontWeight: widget.isActive ? FontWeight.w700 : FontWeight.w500,
+                ),
               ),
-            ),
-            const SizedBox(height: 4),
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              curve: Curves.easeOut,
-              height: 2.5,
-              width: showUnderline ? 20 : 0,
-              decoration: BoxDecoration(
-                color: GitaColors.red,
-                borderRadius: BorderRadius.circular(2),
+              const SizedBox(height: 4),
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 160),
+                curve: Curves.easeOut,
+                height: 2,
+                width: showUnderline ? 18 : 0,
+                decoration: BoxDecoration(
+                  color: GitaColors.crimson,
+                  borderRadius: BorderRadius.circular(1),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
