@@ -40,8 +40,6 @@ class HomePage extends StatelessWidget {
 
         // 3. Three meaningful listening features
         _ListeningFeaturesSection(screenWidth: screenWidth),
-
-        const SizedBox(height: 56),
       ],
     );
   }
@@ -70,16 +68,7 @@ class _HeroSection extends StatelessWidget {
     return Container(
       width: double.infinity,
       decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            GitaColors.ivory,
-            GitaColors.cream,
-            GitaColors.linen,
-          ],
-          stops: [0.0, 0.6, 1.0],
-        ),
+        color: GitaColors.ivory,
         border: Border(
           bottom: BorderSide(
             color: GitaColors.surfaceBorder,
@@ -295,7 +284,15 @@ class _ListeningOptionsSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      color: GitaColors.linen,
+      decoration: const BoxDecoration(
+        color: GitaColors.pureWhite,
+        border: Border(
+          bottom: BorderSide(
+            color: GitaColors.surfaceBorder,
+            width: 1,
+          ),
+        ),
+      ),
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: GitaLayout.maxContentWidth),
@@ -311,7 +308,7 @@ class _ListeningOptionsSection extends StatelessWidget {
                   eyebrow: 'WAYS TO LISTEN',
                   title: 'Web Player vs. Android App',
                   subtitle:
-                      'Choose the Web Player for instant in-browser listening without installation, or download the native Android APK for completely offline listening with lock-screen and background playback.',
+                      'Choose the Web Player for listening without installation, or download the Android app for offline playback and system media controls.',
                   isMobile: _isMobile,
                 ),
                 const SizedBox(height: 32),
@@ -345,18 +342,14 @@ class _ListeningOptionsSection extends StatelessWidget {
   Widget _buildWebCard() {
     return _ComparativeCard(
       badge: 'Zero Installation',
-      badgeColor: GitaColors.crimson,
-      badgeBgColor: GitaColors.ivory,
       icon: Icons.language_rounded,
-      iconColor: GitaColors.crimson,
       title: 'Web Player Experience',
       subtitle: 'Stream instantly in any modern browser without downloading anything.',
       points: const [
+        'Immediate playback in any browser with zero installation or setup.',
         'Runs directly in Chrome, Safari, Firefox, Edge, and mobile browsers.',
-        'Audio continues playing uninterrupted across all website page navigation.',
         'Interactive circular dial scrubber and synchronized linear timeline.',
-        'Configurable sleep timer presets and adjustable playback rates.',
-        'No account creation, sign-in, or software download required.',
+        'No account creation, sign-in, or registration required.',
       ],
       actionLabel: 'Launch Web Player',
       onAction: onOpenPlayer,
@@ -366,17 +359,13 @@ class _ListeningOptionsSection extends StatelessWidget {
   Widget _buildAndroidCard() {
     return _ComparativeCard(
       badge: '100% Offline',
-      badgeColor: const Color(0xFF2E7D32),
-      badgeBgColor: const Color(0xFFE8F5E9),
       icon: Icons.android_rounded,
-      iconColor: const Color(0xFF2E7D32),
       title: 'Android Native Experience',
       subtitle: 'Self-contained standalone playback with full system media integration.',
       points: const [
         'Audio is bundled inside the APK (~27 MB)—plays completely offline.',
         'Runs in the background when the app is minimized or other apps are in use.',
-        'Android system notification drawer with playback and seek controls.',
-        'Lock-screen media session controls displaying album artwork.',
+        'Lock-screen and notification controls displaying album artwork.',
         'Manages system audio focus: pauses automatically when headphones disconnect.',
       ],
       actionLabel: 'Download Android APK (v1.0)',
@@ -387,10 +376,7 @@ class _ListeningOptionsSection extends StatelessWidget {
 
 class _ComparativeCard extends StatelessWidget {
   final String badge;
-  final Color badgeColor;
-  final Color badgeBgColor;
   final IconData icon;
-  final Color iconColor;
   final String title;
   final String subtitle;
   final List<String> points;
@@ -399,10 +385,7 @@ class _ComparativeCard extends StatelessWidget {
 
   const _ComparativeCard({
     required this.badge,
-    required this.badgeColor,
-    required this.badgeBgColor,
     required this.icon,
-    required this.iconColor,
     required this.title,
     required this.subtitle,
     required this.points,
@@ -415,13 +398,13 @@ class _ComparativeCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(28),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: GitaColors.ivory,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: GitaColors.surfaceBorder, width: 1.2),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 18,
+            color: Colors.black.withValues(alpha: 0.025),
+            blurRadius: 16,
             offset: const Offset(0, 4),
           ),
         ],
@@ -429,9 +412,10 @@ class _ComparativeCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header Row: Icon + Badge
+          // Header Row: Icon + Quiet Label
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Container(
                 width: 44,
@@ -441,25 +425,15 @@ class _ComparativeCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: GitaColors.peach, width: 0.8),
                 ),
-                child: Icon(icon, color: iconColor, size: 22),
+                child: Icon(icon, color: GitaColors.crimson, size: 22),
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: badgeBgColor,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: badgeColor.withValues(alpha: 0.3),
-                    width: 1,
-                  ),
-                ),
-                child: Text(
-                  badge,
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    color: badgeColor,
-                  ),
+              Text(
+                badge,
+                style: const TextStyle(
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.w500,
+                  color: GitaColors.textLight,
+                  letterSpacing: 0.1,
                 ),
               ),
             ],
@@ -493,7 +467,7 @@ class _ComparativeCard extends StatelessWidget {
           ),
           const SizedBox(height: 18),
 
-          // Bullet Points
+          // Bullet Points (4 core differences)
           for (final point in points)
             Padding(
               padding: const EdgeInsets.only(bottom: 12),
@@ -502,10 +476,10 @@ class _ComparativeCard extends StatelessWidget {
                 children: [
                   Container(
                     margin: const EdgeInsets.only(top: 6, right: 10),
-                    child: Icon(
+                    child: const Icon(
                       Icons.check_circle_rounded,
                       size: 16,
-                      color: iconColor,
+                      color: GitaColors.crimson,
                     ),
                   ),
                   Expanded(
@@ -523,7 +497,7 @@ class _ComparativeCard extends StatelessWidget {
             ),
           const SizedBox(height: 12),
 
-          // Action Link
+          // Action Link in crimson
           MouseRegion(
             cursor: SystemMouseCursors.click,
             child: GestureDetector(
@@ -533,17 +507,17 @@ class _ComparativeCard extends StatelessWidget {
                 children: [
                   Text(
                     actionLabel,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 14.5,
                       fontWeight: FontWeight.w700,
-                      color: iconColor,
+                      color: GitaColors.crimson,
                     ),
                   ),
                   const SizedBox(width: 6),
-                  Icon(
+                  const Icon(
                     Icons.arrow_forward_rounded,
                     size: 16,
-                    color: iconColor,
+                    color: GitaColors.crimson,
                   ),
                 ],
               ),
@@ -570,14 +544,14 @@ class _ListeningFeaturesSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      color: GitaColors.warmWhite,
+      color: GitaColors.cream,
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: GitaLayout.maxContentWidth),
           child: Padding(
             padding: GitaLayout.responsivePadding(screenWidth).copyWith(
-              top: 56,
-              bottom: 56,
+              top: 64,
+              bottom: 64,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -586,7 +560,7 @@ class _ListeningFeaturesSection extends StatelessWidget {
                   eyebrow: 'PURPOSE-BUILT PLAYER',
                   title: 'Meaningful Listening Features',
                   subtitle:
-                      'Designed from first principles to provide thoughtful, serene playback without algorithmic distraction.',
+                      'Thoughtful playback controls for a calm, uninterrupted listening experience.',
                   isMobile: _isMobile,
                 ),
                 const SizedBox(height: 32),
@@ -602,14 +576,16 @@ class _ListeningFeaturesSection extends StatelessWidget {
                         .toList(),
                   )
                 else
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      for (int i = 0; i < _features.length; i++) ...[
-                        if (i > 0) const SizedBox(width: 20),
-                        Expanded(child: _FeatureCard(feature: _features[i])),
+                  IntrinsicHeight(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        for (int i = 0; i < _features.length; i++) ...[
+                          if (i > 0) const SizedBox(width: 20),
+                          Expanded(child: _FeatureCard(feature: _features[i])),
+                        ],
                       ],
-                    ],
+                    ),
                   ),
               ],
             ),
@@ -634,7 +610,7 @@ class _ListeningFeaturesSection extends StatelessWidget {
     ),
     _FeatureItem(
       icon: Icons.spa_outlined,
-      title: 'Distraction-Free Devotion',
+      title: 'Distraction-Free Listening',
       description:
           'Dedicated strictly to listening. No commercial advertisements, no sign-in or account registration required, keeping your focus on the sacred discourse.',
     ),
@@ -663,14 +639,14 @@ class _FeatureCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(26),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: GitaColors.pureWhite,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: GitaColors.surfaceBorder, width: 1),
+        border: Border.all(color: GitaColors.surfaceBorder, width: 1.2),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.025),
-            blurRadius: 14,
-            offset: const Offset(0, 3),
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
           ),
         ],
       ),

@@ -25,7 +25,6 @@ class ContactPage extends StatelessWidget {
       children: [
         _buildPageHeader(isMobile, screenWidth),
         _buildContent(isMobile, screenWidth),
-        const SizedBox(height: 32),
       ],
     );
   }
@@ -34,7 +33,7 @@ class ContactPage extends StatelessWidget {
     return Container(
       width: double.infinity,
       decoration: const BoxDecoration(
-        color: GitaColors.warmWhite,
+        color: GitaColors.ivory,
         border: Border(
           bottom: BorderSide(
             color: GitaColors.surfaceBorder,
@@ -87,14 +86,14 @@ class ContactPage extends StatelessWidget {
   Widget _buildContent(bool isMobile, double screenWidth) {
     return Container(
       width: double.infinity,
-      color: GitaColors.linen,
+      color: GitaColors.cream,
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: GitaLayout.maxContentWidth),
           child: Padding(
             padding: GitaLayout.responsivePadding(screenWidth).copyWith(
               top: 40,
-              bottom: 48,
+              bottom: isMobile ? 48 : 64,
             ),
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 780),
@@ -103,18 +102,18 @@ class ContactPage extends StatelessWidget {
                 children: [
                   // Contact Cards (Developer, Issue Tracker, Repository)
                   if (isMobile)
-                    Column(
+                    const Column(
                       children: [
-                        _buildContactCard(
+                        _ContactCard(
                           icon: Icons.bug_report_outlined,
                           title: 'Issue Tracker',
                           subtitle:
-                              'Report playback defects, browser-specific issues, or audio anomalies directly on GitHub.',
-                          actionLabel: 'Open GitHub Issues',
+                              'Report playback defects, browser-specific issues, or audio anomalies.',
+                          actionLabel: 'Open Issues',
                           url: _githubIssuesUrl,
                         ),
-                        const SizedBox(height: 16),
-                        _buildContactCard(
+                        SizedBox(height: 16),
+                        _ContactCard(
                           icon: Icons.code_rounded,
                           title: 'Source Code',
                           subtitle:
@@ -122,10 +121,10 @@ class ContactPage extends StatelessWidget {
                           actionLabel: 'View Repository',
                           url: _githubRepoUrl,
                         ),
-                        const SizedBox(height: 16),
-                        _buildContactCard(
+                        SizedBox(height: 16),
+                        _ContactCard(
                           icon: Icons.person_outline_rounded,
-                          title: 'Maintainer',
+                          title: 'Project Maintainer',
                           subtitle:
                               'Developed and maintained by PrasheelVarma on GitHub.',
                           actionLabel: 'GitHub Profile',
@@ -134,42 +133,44 @@ class ContactPage extends StatelessWidget {
                       ],
                     )
                   else
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: _buildContactCard(
-                            icon: Icons.bug_report_outlined,
-                            title: 'Issue Tracker',
-                            subtitle:
-                                'Report playback defects, browser-specific issues, or audio anomalies.',
-                            actionLabel: 'Open Issues',
-                            url: _githubIssuesUrl,
+                    const IntrinsicHeight(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Expanded(
+                            child: _ContactCard(
+                              icon: Icons.bug_report_outlined,
+                              title: 'Issue Tracker',
+                              subtitle:
+                                  'Report playback defects, browser-specific issues, or audio anomalies.',
+                              actionLabel: 'Open Issues',
+                              url: _githubIssuesUrl,
+                            ),
                           ),
-                        ),
-                        const SizedBox(width: 18),
-                        Expanded(
-                          child: _buildContactCard(
-                            icon: Icons.code_rounded,
-                            title: 'Source Code',
-                            subtitle:
-                                'View the repository structure, documentation, and commit history.',
-                            actionLabel: 'View Repository',
-                            url: _githubRepoUrl,
+                          SizedBox(width: 18),
+                          Expanded(
+                            child: _ContactCard(
+                              icon: Icons.code_rounded,
+                              title: 'Source Code',
+                              subtitle:
+                                  'View the repository structure, documentation, and commit history.',
+                              actionLabel: 'View Repository',
+                              url: _githubRepoUrl,
+                            ),
                           ),
-                        ),
-                        const SizedBox(width: 18),
-                        Expanded(
-                          child: _buildContactCard(
-                            icon: Icons.person_outline_rounded,
-                            title: 'Maintainer',
-                            subtitle:
-                                'Developed and maintained by PrasheelVarma on GitHub.',
-                            actionLabel: 'GitHub Profile',
-                            url: _githubProfileUrl,
+                          SizedBox(width: 18),
+                          Expanded(
+                            child: _ContactCard(
+                              icon: Icons.person_outline_rounded,
+                              title: 'Project Maintainer',
+                              subtitle:
+                                  'Developed and maintained by PrasheelVarma on GitHub.',
+                              actionLabel: 'GitHub Profile',
+                              url: _githubProfileUrl,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
 
                   const SizedBox(height: 36),
@@ -216,7 +217,7 @@ class ContactPage extends StatelessWidget {
                         ),
                         SizedBox(height: 12),
                         Text(
-                          'If you encounter audio playback issues on specific Android device models or web browsers, opening a GitHub issue with device and browser details is the best way to help improve the project.',
+                          'If you encounter playback issues on specific devices or browsers, please open a GitHub issue with device and browser details.',
                           style: TextStyle(
                             fontSize: 14,
                             color: GitaColors.textMedium,
@@ -225,7 +226,7 @@ class ContactPage extends StatelessWidget {
                         ),
                         SizedBox(height: 10),
                         Text(
-                          'Code contributions may be proposed through GitHub pull requests. Note that this repository is available for public viewing and reference; no license is granted for independent source code redistribution, commercial use, or re-publication.',
+                          'Code contributions may be proposed through GitHub pull requests. Note that this repository is available for public reference; independent commercial redistribution or re-publication is not permitted.',
                           style: TextStyle(
                             fontSize: 14,
                             color: GitaColors.textMedium,
@@ -243,14 +244,32 @@ class ContactPage extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget _buildContactCard({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required String actionLabel,
-    required String url,
-  }) {
+class _ContactCard extends StatefulWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final String actionLabel;
+  final String url;
+
+  const _ContactCard({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.actionLabel,
+    required this.url,
+  });
+
+  @override
+  State<_ContactCard> createState() => _ContactCardState();
+}
+
+class _ContactCardState extends State<_ContactCard> {
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -262,57 +281,67 @@ class ContactPage extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.025),
-            blurRadius: 10,
+            color: Colors.black.withValues(alpha: _isHovered ? 0.05 : 0.025),
+            blurRadius: _isHovered ? 14 : 10,
             offset: const Offset(0, 3),
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: GitaColors.ivory,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: GitaColors.peach, width: 0.8),
-            ),
-            child: Icon(icon, color: GitaColors.crimson, size: 20),
-          ),
-          const SizedBox(height: 14),
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w700,
-              color: GitaColors.textDark,
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            subtitle,
-            style: const TextStyle(
-              fontSize: 13,
-              color: GitaColors.textMedium,
-              height: 1.45,
-            ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: GitaColors.ivory,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: GitaColors.peach, width: 0.8),
+                ),
+                child: Icon(widget.icon, color: GitaColors.crimson, size: 20),
+              ),
+              const SizedBox(height: 14),
+              Text(
+                widget.title,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: GitaColors.textDark,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                widget.subtitle,
+                style: const TextStyle(
+                  fontSize: 13,
+                  color: GitaColors.textMedium,
+                  height: 1.45,
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 16),
           MouseRegion(
             cursor: SystemMouseCursors.click,
+            onEnter: (_) => setState(() => _isHovered = true),
+            onExit: (_) => setState(() => _isHovered = false),
             child: GestureDetector(
-              onTap: () => launchUrlSafely(url),
+              onTap: () => launchUrlSafely(widget.url),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    actionLabel,
-                    style: const TextStyle(
+                    widget.actionLabel,
+                    style: TextStyle(
                       fontSize: 13.5,
                       fontWeight: FontWeight.w700,
                       color: GitaColors.crimson,
+                      decoration: _isHovered ? TextDecoration.underline : null,
+                      decorationColor: GitaColors.crimson,
                     ),
                   ),
                   const SizedBox(width: 4),

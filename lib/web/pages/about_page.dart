@@ -24,7 +24,6 @@ class AboutPage extends StatelessWidget {
         _buildPageHeader(isMobile, screenWidth),
         // Content sections
         _buildContent(isMobile, screenWidth),
-        const SizedBox(height: 32),
       ],
     );
   }
@@ -33,7 +32,7 @@ class AboutPage extends StatelessWidget {
     return Container(
       width: double.infinity,
       decoration: const BoxDecoration(
-        color: GitaColors.warmWhite,
+        color: GitaColors.ivory,
         border: Border(
           bottom: BorderSide(
             color: GitaColors.surfaceBorder,
@@ -86,14 +85,14 @@ class AboutPage extends StatelessWidget {
   Widget _buildContent(bool isMobile, double screenWidth) {
     return Container(
       width: double.infinity,
-      color: GitaColors.linen,
+      color: GitaColors.cream,
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: GitaLayout.maxContentWidth),
           child: Padding(
             padding: GitaLayout.responsivePadding(screenWidth).copyWith(
               top: 40,
-              bottom: 48,
+              bottom: isMobile ? 48 : 64,
             ),
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 780),
