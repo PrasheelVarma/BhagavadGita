@@ -30,7 +30,7 @@ class WebsiteHeader extends StatelessWidget {
         color: Colors.white,
         border: Border(
           bottom: BorderSide(
-            color: Color(0xFFEBE3D8),
+            color: GitaColors.surfaceBorder,
             width: 1,
           ),
         ),

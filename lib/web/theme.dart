@@ -15,13 +15,13 @@ abstract final class GitaColors {
   static const amber = Color(0xFFFFB300);
   static const antiqueGold = Color(0xFFD4AF37);
   static const goldAccent = Color(0xFFC59B27);
-  static const peach = Color(0xFFFFCC80);
+  static const peach = Color(0xFFE5DFD5);
 
-  // Warm backgrounds & surfaces
-  static const ivory = Color(0xFFFFF9EE);
-  static const cream = Color(0xFFFFF3DE);
-  static const linen = Color(0xFFFDFBF7);
-  static const warmWhite = Color(0xFFFAF6F0);
+  // Warm backgrounds & surfaces (Editorial architectural neutrals, eliminating orange/peach cast)
+  static const ivory = Color(0xFFFAF8F5);
+  static const cream = Color(0xFFF2EFE8);
+  static const linen = Color(0xFFF7F5F0);
+  static const warmWhite = Color(0xFFFAF9F6);
   static const pureWhite = Color(0xFFFFFFFF);
 
   // Dark backgrounds & cards
@@ -35,10 +35,10 @@ abstract final class GitaColors {
   static const textOnDark = Color(0xFFFFF9EE);
 
   // Borders & Dividers
-  static const surfaceBorder = Color(0xFFEADECF);
-  static const borderLight = Color(0xFFF0E6D8);
+  static const surfaceBorder = Color(0xFFE5DFD5);
+  static const borderLight = Color(0xFFECE7DF);
   static const surfaceCard = Color(0xFFFFFFFF);
-  static const surfaceSubtle = Color(0xFFF9F5EE);
+  static const surfaceSubtle = Color(0xFFF2EFE8);
 
   // Status indicators
   static const statusActive = Color(0xFF2E7D32);
