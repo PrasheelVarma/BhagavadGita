@@ -36,6 +36,7 @@ class PlayerPage extends StatelessWidget {
             margin: const EdgeInsets.symmetric(vertical: 16),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: const Color(0xFFE2D6C8), width: 1.2),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.08),

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../theme.dart';
 
-/// Website header — clean sticky navigation bar.
+/// Clean, dignified sticky navigation header for the Bhagavad Gita website.
 class WebsiteHeader extends StatelessWidget {
   final String currentRoute;
   final VoidCallback onNavigateHome;
@@ -26,23 +26,23 @@ class WebsiteHeader extends StatelessWidget {
 
     return Container(
       height: GitaLayout.headerHeight,
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.96),
-        border: const Border(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        border: Border(
           bottom: BorderSide(
-            color: Color(0xFFEEE5DB),
+            color: Color(0xFFEBE3D8),
             width: 1,
           ),
         ),
       ),
       child: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: GitaLayout.maxContentWidth + 96),
+          constraints: const BoxConstraints(maxWidth: GitaLayout.maxContentWidth),
           child: Padding(
             padding: GitaLayout.responsivePadding(screenWidth),
             child: Row(
               children: [
-                // Logo / Brand
+                // Brand
                 _buildLogo(),
                 const Spacer(),
                 // Navigation
@@ -67,27 +67,13 @@ class WebsiteHeader extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
+              width: 38,
+              height: 38,
+              decoration: const BoxDecoration(
                 shape: BoxShape.circle,
-                gradient: const LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    GitaColors.vermillion,
-                    GitaColors.crimson,
-                  ],
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: GitaColors.crimson.withValues(alpha: 0.22),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
+                color: GitaColors.crimson,
               ),
-              padding: const EdgeInsets.all(3.5),
+              padding: const EdgeInsets.all(3),
               child: Image.asset(
                 'assets/img2.png',
                 fit: BoxFit.contain,
@@ -102,10 +88,10 @@ class WebsiteHeader extends StatelessWidget {
                 const Text(
                   'Bhagavad Gita',
                   style: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w800,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
                     color: GitaColors.crimson,
-                    letterSpacing: 0.3,
+                    letterSpacing: 0.2,
                   ),
                 ),
                 Text(
@@ -113,7 +99,7 @@ class WebsiteHeader extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w500,
-                    color: GitaColors.textLight.withValues(alpha: 0.85),
+                    color: GitaColors.textLight.withValues(alpha: 0.9),
                     letterSpacing: 0.2,
                   ),
                 ),
@@ -160,9 +146,9 @@ class WebsiteHeader extends StatelessWidget {
     return PopupMenuButton<String>(
       icon: const Icon(Icons.menu_rounded, color: GitaColors.textDark, size: 24),
       offset: const Offset(0, GitaLayout.headerHeight - 8),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       color: Colors.white,
-      elevation: 8,
+      elevation: 4,
       onSelected: (value) {
         switch (value) {
           case '/':
@@ -194,7 +180,7 @@ class WebsiteHeader extends StatelessWidget {
       child: Text(
         label,
         style: TextStyle(
-          fontSize: 15,
+          fontSize: 14.5,
           fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
           color: isActive ? GitaColors.crimson : GitaColors.textDark,
         ),
@@ -203,7 +189,7 @@ class WebsiteHeader extends StatelessWidget {
   }
 }
 
-/// Individual navigation link with hover underline effect.
+/// Navigation link with clean active/hover indicators.
 class _NavLink extends StatefulWidget {
   final String label;
   final bool isActive;
@@ -232,33 +218,36 @@ class _NavLinkState extends State<_NavLink> {
       onExit: (_) => setState(() => _isHovered = false),
       child: GestureDetector(
         onTap: widget.onTap,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              widget.label,
-              style: GitaTextStyles.navLink.copyWith(
-                color: widget.isActive
-                    ? GitaColors.crimson
-                    : _isHovered
-                        ? GitaColors.red
-                        : GitaColors.textDark,
-                fontWeight: widget.isActive ? FontWeight.w700 : FontWeight.w500,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                widget.label,
+                style: GitaTextStyles.navLink.copyWith(
+                  color: widget.isActive
+                      ? GitaColors.crimson
+                      : _isHovered
+                          ? GitaColors.crimson
+                          : GitaColors.textDark,
+                  fontWeight: widget.isActive ? FontWeight.w700 : FontWeight.w500,
+                ),
               ),
-            ),
-            const SizedBox(height: 4),
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              curve: Curves.easeOut,
-              height: 2.5,
-              width: showUnderline ? 20 : 0,
-              decoration: BoxDecoration(
-                color: GitaColors.red,
-                borderRadius: BorderRadius.circular(2),
+              const SizedBox(height: 4),
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 160),
+                curve: Curves.easeOut,
+                height: 2,
+                width: showUnderline ? 18 : 0,
+                decoration: BoxDecoration(
+                  color: GitaColors.crimson,
+                  borderRadius: BorderRadius.circular(1),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

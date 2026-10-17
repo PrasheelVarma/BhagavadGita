@@ -3,12 +3,18 @@ import 'package:flutter/material.dart';
 import '../theme.dart';
 import '../utils/url_launcher_helper.dart';
 
-/// Home page — project introduction, platform availability, and direct player access.
+/// Editorial, artwork-led Home page for the Bhagavad Gita audio player.
+/// Structures the experience into three purposeful sections:
+/// 1. Luminous Hero with framed artwork and clear listening actions.
+/// 2. Detailed, balanced comparison of the Web Player vs Android App.
+/// 3. Three core listening features (scrubbers, sleep timer, ad-free focus).
 class HomePage extends StatelessWidget {
   final VoidCallback onOpenPlayer;
 
   const HomePage({super.key, required this.onOpenPlayer});
 
+  static const String _androidReleaseUrl =
+      'https://github.com/PrasheelVarma/BhagavadGita/releases/tag/v1.0-android';
 
   @override
   Widget build(BuildContext context) {
@@ -18,40 +24,46 @@ class HomePage extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        // 1. Editorial, artwork-led hero
         _HeroSection(
           screenWidth: screenWidth,
           onOpenPlayer: onOpenPlayer,
+          androidReleaseUrl: _androidReleaseUrl,
         ),
-        _PlatformAvailabilitySection(screenWidth: screenWidth),
-        _FeaturesComparisonSection(
+
+        // 2. How to listen: Web Player vs Android App
+        _ListeningOptionsSection(
           screenWidth: screenWidth,
           onOpenPlayer: onOpenPlayer,
+          androidReleaseUrl: _androidReleaseUrl,
         ),
-        _AndroidDownloadBanner(screenWidth: screenWidth),
-        const SizedBox(height: 32),
+
+        // 3. Three meaningful listening features
+        _ListeningFeaturesSection(screenWidth: screenWidth),
+
+        const SizedBox(height: 56),
       ],
     );
   }
 }
 
-// ---------------------------------------------------------------------------
-// Hero Section
-// ---------------------------------------------------------------------------
+// ===========================================================================
+// 1. Editorial, Artwork-Led Hero Section
+// ===========================================================================
 
 class _HeroSection extends StatelessWidget {
   final double screenWidth;
   final VoidCallback onOpenPlayer;
+  final String androidReleaseUrl;
 
   const _HeroSection({
     required this.screenWidth,
     required this.onOpenPlayer,
+    required this.androidReleaseUrl,
   });
 
   bool get _isWide => screenWidth > GitaLayout.tabletBreakpoint;
   bool get _isMobile => screenWidth < GitaLayout.mobileBreakpoint;
-
-  static const String _androidReleaseUrl =
-      'https://github.com/PrasheelVarma/BhagavadGita/releases/tag/v1.0-android';
 
   @override
   Widget build(BuildContext context) {
@@ -64,19 +76,24 @@ class _HeroSection extends StatelessWidget {
           colors: [
             GitaColors.ivory,
             GitaColors.cream,
-            GitaColors.warmWhite,
+            GitaColors.linen,
           ],
           stops: [0.0, 0.6, 1.0],
+        ),
+        border: Border(
+          bottom: BorderSide(
+            color: GitaColors.surfaceBorder,
+            width: 1,
+          ),
         ),
       ),
       child: Center(
         child: ConstrainedBox(
-          constraints:
-              const BoxConstraints(maxWidth: GitaLayout.maxContentWidth + 96),
+          constraints: const BoxConstraints(maxWidth: GitaLayout.maxContentWidth),
           child: Padding(
             padding: GitaLayout.responsivePadding(screenWidth).copyWith(
-              top: _isMobile ? 44 : 72,
-              bottom: _isMobile ? 44 : 72,
+              top: _isMobile ? 36 : 64,
+              bottom: _isMobile ? 40 : 68,
             ),
             child: _isWide ? _buildWideLayout() : _buildNarrowLayout(),
           ),
@@ -89,16 +106,14 @@ class _HeroSection extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        // Text content
         Expanded(
           flex: 6,
           child: _buildTextContent(),
         ),
-        const SizedBox(width: 48),
-        // Artwork
+        const SizedBox(width: 56),
         Expanded(
           flex: 4,
-          child: _buildArtwork(),
+          child: _buildArtworkFrame(),
         ),
       ],
     );
@@ -107,8 +122,8 @@ class _HeroSection extends StatelessWidget {
   Widget _buildNarrowLayout() {
     return Column(
       children: [
-        _buildArtwork(),
-        SizedBox(height: _isMobile ? 32 : 44),
+        _buildArtworkFrame(),
+        SizedBox(height: _isMobile ? 28 : 40),
         _buildTextContent(centered: true),
       ],
     );
@@ -119,27 +134,51 @@ class _HeroSection extends StatelessWidget {
       crossAxisAlignment:
           centered ? CrossAxisAlignment.center : CrossAxisAlignment.start,
       children: [
-        // Main headline
+        // Descriptive Eyebrow
+        Text(
+          'TELUGU DEVOTIONAL RECITATION • ~73 MINUTES',
+          style: GitaTextStyles.eyebrow,
+          textAlign: centered ? TextAlign.center : TextAlign.left,
+        ),
+        const SizedBox(height: 12),
+
+        // Headline
         Text(
           'Bhagavad Gita',
           style: GitaTextStyles.heroHeadline.copyWith(
-            fontSize: _isMobile ? 36 : 50,
+            fontSize: _isMobile ? 36 : 48,
           ),
           textAlign: centered ? TextAlign.center : TextAlign.left,
         ),
-        const SizedBox(height: 14),
-        // Subtitle
+        const SizedBox(height: 8),
+
+        // Subtitle Attribution
+        Text(
+          'Recitation & Commentary by Sri Ghantasala Venkateswara Rao',
+          style: TextStyle(
+            fontSize: _isMobile ? 15.5 : 18,
+            fontWeight: FontWeight.w600,
+            color: GitaColors.textLight,
+            letterSpacing: 0.1,
+          ),
+          textAlign: centered ? TextAlign.center : TextAlign.left,
+        ),
+        const SizedBox(height: 18),
+
+        // Description
         ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 580),
           child: Text(
-            'The revered Telugu Bhagavad Gita recording sung by Sri Ghantasala Venkateswara Rao. Dedicated, clean, and distraction-free audio listening available on Web and native Android.',
-            style: GitaTextStyles.sectionSubheading.copyWith(
-              fontSize: _isMobile ? 15.5 : 18,
+            'A dedicated audio player for the revered Telugu Bhagavad Gita rendition. Designed for calm, contemplation-focused listening with no advertisements, user accounts, or algorithmic feeds.',
+            style: GitaTextStyles.bodyText.copyWith(
+              fontSize: _isMobile ? 15 : 16.5,
+              height: 1.6,
             ),
             textAlign: centered ? TextAlign.center : TextAlign.left,
           ),
         ),
         const SizedBox(height: 32),
+
         // CTAs: Web Player + APK Download
         Wrap(
           alignment: centered ? WrapAlignment.center : WrapAlignment.start,
@@ -147,26 +186,38 @@ class _HeroSection extends StatelessWidget {
           spacing: 16,
           runSpacing: 14,
           children: [
-            _PrimaryButton(
-              label: 'Open Player',
+            _HeroPrimaryButton(
+              label: 'Open Web Player',
               icon: Icons.play_arrow_rounded,
               onTap: onOpenPlayer,
               isMobile: _isMobile,
             ),
-            _SecondaryButton(
-              label: 'Download APK (v1.0)',
+            _HeroSecondaryButton(
+              label: 'Download Android APK',
               icon: Icons.android_rounded,
-              onTap: () => launchUrlSafely(_androidReleaseUrl),
+              onTap: () => launchUrlSafely(androidReleaseUrl),
               isMobile: _isMobile,
             ),
           ],
+        ),
+        const SizedBox(height: 18),
+
+        // Contextual Sub-text
+        Text(
+          'Instant in-browser streaming on all devices • 100% offline playback on Android',
+          style: TextStyle(
+            fontSize: _isMobile ? 12.5 : 13.5,
+            color: GitaColors.textLight,
+            fontWeight: FontWeight.w500,
+          ),
+          textAlign: centered ? TextAlign.center : TextAlign.left,
         ),
       ],
     );
   }
 
-  Widget _buildArtwork() {
-    final artSize = _isMobile ? 220.0 : (_isWide ? 310.0 : 260.0);
+  Widget _buildArtworkFrame() {
+    final artSize = _isMobile ? 220.0 : (_isWide ? 300.0 : 260.0);
 
     return Center(
       child: SizedBox(
@@ -175,7 +226,7 @@ class _HeroSection extends StatelessWidget {
         child: Stack(
           alignment: Alignment.center,
           children: [
-            // Ambient glow
+            // Layered warm ambient lighting behind the artwork
             Container(
               width: artSize * 0.94,
               height: artSize * 0.94,
@@ -183,19 +234,19 @@ class _HeroSection extends StatelessWidget {
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: GitaColors.amber.withValues(alpha: 0.22),
-                    blurRadius: 44,
-                    spreadRadius: 6,
+                    color: GitaColors.amber.withValues(alpha: 0.20),
+                    blurRadius: 42,
+                    spreadRadius: 4,
                   ),
                   BoxShadow(
-                    color: GitaColors.red.withValues(alpha: 0.12),
-                    blurRadius: 60,
+                    color: GitaColors.crimson.withValues(alpha: 0.12),
+                    blurRadius: 56,
                     spreadRadius: 2,
                   ),
                 ],
               ),
             ),
-            // Circular frame
+            // Clean circular artwork with subtle elevation shadow
             Container(
               width: artSize * 0.88,
               height: artSize * 0.88,
@@ -203,7 +254,7 @@ class _HeroSection extends StatelessWidget {
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.14),
+                    color: Colors.black.withValues(alpha: 0.15),
                     blurRadius: 24,
                     offset: const Offset(0, 8),
                   ),
@@ -223,297 +274,19 @@ class _HeroSection extends StatelessWidget {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Platform Availability Section (Inspired by Spacedesk)
-// ---------------------------------------------------------------------------
+// ===========================================================================
+// 2. How to Listen: Web Player vs Android App
+// ===========================================================================
 
-class _PlatformAvailabilitySection extends StatelessWidget {
-  final double screenWidth;
-
-  const _PlatformAvailabilitySection({required this.screenWidth});
-
-  bool get _isMobile => screenWidth < GitaLayout.mobileBreakpoint;
-  bool get _isTablet => screenWidth < GitaLayout.tabletBreakpoint;
-
-  static const String _androidReleaseUrl =
-      'https://github.com/PrasheelVarma/BhagavadGita/releases/tag/v1.0-android';
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      color: GitaColors.pureWhite,
-      child: Center(
-        child: ConstrainedBox(
-          constraints:
-              const BoxConstraints(maxWidth: GitaLayout.maxContentWidth + 96),
-          child: Padding(
-            padding: GitaLayout.responsivePadding(screenWidth).copyWith(
-              top: 56,
-              bottom: 48,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Section Title & Intro
-                Row(
-                  children: [
-                    Container(
-                      width: 4,
-                      height: 24,
-                      decoration: BoxDecoration(
-                        color: GitaColors.red,
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Text(
-                      'Platform Availability',
-                      style: GitaTextStyles.sectionHeading.copyWith(
-                        fontSize: _isMobile ? 24 : 28,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Current releases and platform compatibility status across web, mobile, and desktop.',
-                  style: GitaTextStyles.sectionSubheading.copyWith(
-                    fontSize: _isMobile ? 14.5 : 16,
-                  ),
-                ),
-                const SizedBox(height: 28),
-
-                // Platform Cards
-                if (_isMobile)
-                  Column(
-                    children: _platforms
-                        .map((p) => Padding(
-                              padding: const EdgeInsets.only(bottom: 16),
-                              child: _PlatformCard(platform: p),
-                            ))
-                        .toList(),
-                  )
-                else if (_isTablet)
-                  Wrap(
-                    spacing: 16,
-                    runSpacing: 16,
-                    children: _platforms
-                        .map((p) => SizedBox(
-                              width: (screenWidth - 80) / 2,
-                              child: _PlatformCard(platform: p),
-                            ))
-                        .toList(),
-                  )
-                else
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      for (int i = 0; i < _platforms.length; i++) ...[
-                        if (i > 0) const SizedBox(width: 16),
-                        Expanded(child: _PlatformCard(platform: _platforms[i])),
-                      ],
-                    ],
-                  ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  static const List<_PlatformInfo> _platforms = [
-    _PlatformInfo(
-      icon: Icons.language_rounded,
-      name: 'Web Application',
-      version: 'Available Now',
-      status: _AvailabilityStatus.available,
-      badgeText: 'Active',
-      description: 'Stream directly in any modern browser. Zero installation.',
-      actionLabel: 'Open in Browser',
-      actionRoute: '/player',
-    ),
-    _PlatformInfo(
-      icon: Icons.android_rounded,
-      name: 'Android App',
-      version: 'v1.0 (APK)',
-      status: _AvailabilityStatus.available,
-      badgeText: 'Available',
-      description: 'Fully offline after installation. Lock-screen controls.',
-      actionLabel: 'Download APK',
-      actionUrl: _androidReleaseUrl,
-    ),
-    _PlatformInfo(
-      icon: Icons.desktop_windows_rounded,
-      name: 'Windows Desktop',
-      version: 'Cross-Platform',
-      status: _AvailabilityStatus.planned,
-      badgeText: 'Planned',
-      description: 'Future native desktop package. Currently in roadmap.',
-    ),
-    _PlatformInfo(
-      icon: Icons.terminal_rounded,
-      name: 'Linux & macOS',
-      version: 'Cross-Platform',
-      status: _AvailabilityStatus.planned,
-      badgeText: 'Planned',
-      description: 'Native Linux & macOS bundles planned for later release.',
-    ),
-  ];
-}
-
-enum _AvailabilityStatus { available, planned }
-
-class _PlatformInfo {
-  final IconData icon;
-  final String name;
-  final String version;
-  final _AvailabilityStatus status;
-  final String badgeText;
-  final String description;
-  final String? actionLabel;
-  final String? actionRoute;
-  final String? actionUrl;
-
-  const _PlatformInfo({
-    required this.icon,
-    required this.name,
-    required this.version,
-    required this.status,
-    required this.badgeText,
-    required this.description,
-    this.actionLabel,
-    this.actionRoute,
-    this.actionUrl,
-  });
-}
-
-class _PlatformCard extends StatelessWidget {
-  final _PlatformInfo platform;
-
-  const _PlatformCard({required this.platform});
-
-  bool get _isAvailable => platform.status == _AvailabilityStatus.available;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: _isAvailable ? Colors.white : const Color(0xFFFAF8F5),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: _isAvailable ? const Color(0xFFE2D6C8) : const Color(0xFFECE5DD),
-          width: 1.2,
-        ),
-        boxShadow: _isAvailable
-            ? [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.04),
-                  blurRadius: 14,
-                  offset: const Offset(0, 4),
-                ),
-              ]
-            : null,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Top Row: Icon + Status Badge
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Container(
-                width: 42,
-                height: 42,
-                decoration: BoxDecoration(
-                  color: _isAvailable
-                      ? GitaColors.ivory
-                      : Colors.grey.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Icon(
-                  platform.icon,
-                  color: _isAvailable ? GitaColors.crimson : GitaColors.statusPlanned,
-                  size: 22,
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: _isAvailable
-                      ? GitaColors.statusActiveBg
-                      : GitaColors.statusPlannedBg,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: _isAvailable
-                        ? GitaColors.statusActive.withValues(alpha: 0.3)
-                        : Colors.grey.withValues(alpha: 0.3),
-                    width: 1,
-                  ),
-                ),
-                child: Text(
-                  platform.badgeText,
-                  style: TextStyle(
-                    fontSize: 11.5,
-                    fontWeight: FontWeight.w700,
-                    color: _isAvailable
-                        ? GitaColors.statusActive
-                        : GitaColors.statusPlanned,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 14),
-          // Platform Name
-          Text(
-            platform.name,
-            style: TextStyle(
-              fontSize: 16.5,
-              fontWeight: FontWeight.w700,
-              color: _isAvailable ? GitaColors.textDark : Colors.grey.shade700,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            platform.version,
-            style: TextStyle(
-              fontSize: 12.5,
-              fontWeight: FontWeight.w600,
-              color: _isAvailable ? GitaColors.red : GitaColors.textLight,
-            ),
-          ),
-          const SizedBox(height: 10),
-          // Description
-          Text(
-            platform.description,
-            style: TextStyle(
-              fontSize: 13.5,
-              color: _isAvailable
-                  ? GitaColors.textMedium
-                  : Colors.grey.shade600,
-              height: 1.45,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Features & Comparison Section
-// ---------------------------------------------------------------------------
-
-class _FeaturesComparisonSection extends StatelessWidget {
+class _ListeningOptionsSection extends StatelessWidget {
   final double screenWidth;
   final VoidCallback onOpenPlayer;
+  final String androidReleaseUrl;
 
-  const _FeaturesComparisonSection({
+  const _ListeningOptionsSection({
     required this.screenWidth,
     required this.onOpenPlayer,
+    required this.androidReleaseUrl,
   });
 
   bool get _isMobile => screenWidth < GitaLayout.mobileBreakpoint;
@@ -522,11 +295,10 @@ class _FeaturesComparisonSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      color: GitaColors.warmWhite,
+      color: GitaColors.linen,
       child: Center(
         child: ConstrainedBox(
-          constraints:
-              const BoxConstraints(maxWidth: GitaLayout.maxContentWidth + 96),
+          constraints: const BoxConstraints(maxWidth: GitaLayout.maxContentWidth),
           child: Padding(
             padding: GitaLayout.responsivePadding(screenWidth).copyWith(
               top: 56,
@@ -535,101 +307,31 @@ class _FeaturesComparisonSection extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Web Player vs Android Experience',
-                  style: GitaTextStyles.sectionHeading.copyWith(
-                    fontSize: _isMobile ? 24 : 28,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Both experiences share the same pure, distraction-free listening focus, tailored to their platform.',
-                  style: GitaTextStyles.sectionSubheading.copyWith(
-                    fontSize: _isMobile ? 14.5 : 16,
-                  ),
+                _SectionTitleBlock(
+                  eyebrow: 'WAYS TO LISTEN',
+                  title: 'Web Player vs. Android App',
+                  subtitle:
+                      'Choose the Web Player for instant in-browser listening without installation, or download the native Android APK for completely offline listening with lock-screen and background playback.',
+                  isMobile: _isMobile,
                 ),
                 const SizedBox(height: 32),
 
-                // Side-by-Side Cards
+                // Side-by-side or stacked comparative cards
                 if (_isMobile)
                   Column(
                     children: [
-                      _buildComparisonCard(
-                        title: 'Web Player Experience',
-                        badge: 'Zero Installation',
-                        icon: Icons.public_rounded,
-                        accentColor: GitaColors.crimson,
-                        points: const [
-                          'Runs instantly in any modern desktop or mobile browser.',
-                          'Responsive layout adapts to large monitors, tablets, and phones.',
-                          'Custom circular seek dial and synchronized scrub bar.',
-                          'Continuous audio playback across website pages.',
-                          'No account, no sign-in, and zero analytics tracking.',
-                        ],
-                        actionText: 'Launch Web Player',
-                        onAction: onOpenPlayer,
-                      ),
+                      _buildWebCard(),
                       const SizedBox(height: 24),
-                      _buildComparisonCard(
-                        title: 'Android Native Experience',
-                        badge: '100% Offline',
-                        icon: Icons.android_rounded,
-                        accentColor: const Color(0xFF2E7D32),
-                        points: const [
-                          'Audio is fully bundled — works completely offline without internet.',
-                          'Runs smoothly in the background while other apps are active.',
-                          'System notification drawer with Play, Pause, and Seek controls.',
-                          'Lock-screen media session controls with artwork display.',
-                          'Handles audio focus automatically for phone calls and alarms.',
-                        ],
-                        actionText: 'View GitHub Release',
-                        onAction: () => launchUrlSafely(
-                          'https://github.com/PrasheelVarma/BhagavadGita/releases/tag/v1.0-android',
-                        ),
-                      ),
+                      _buildAndroidCard(),
                     ],
                   )
                 else
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(
-                        child: _buildComparisonCard(
-                          title: 'Web Player Experience',
-                          badge: 'Zero Installation',
-                          icon: Icons.public_rounded,
-                          accentColor: GitaColors.crimson,
-                          points: const [
-                            'Runs instantly in any modern desktop or mobile browser.',
-                            'Responsive layout adapts to large monitors, tablets, and phones.',
-                            'Custom circular seek dial and synchronized scrub bar.',
-                            'Continuous audio playback across website pages.',
-                            'No account, no sign-in, and zero analytics tracking.',
-                          ],
-                          actionText: 'Launch Web Player',
-                          onAction: onOpenPlayer,
-                        ),
-                      ),
+                      Expanded(child: _buildWebCard()),
                       const SizedBox(width: 28),
-                      Expanded(
-                        child: _buildComparisonCard(
-                          title: 'Android Native Experience',
-                          badge: '100% Offline',
-                          icon: Icons.android_rounded,
-                          accentColor: const Color(0xFF2E7D32),
-                          points: const [
-                            'Audio is fully bundled — works completely offline without internet.',
-                            'Runs smoothly in the background while other apps are active.',
-                            'System notification drawer with Play, Pause, and Seek controls.',
-                            'Lock-screen media session controls with artwork display.',
-                            'Handles audio focus automatically for phone calls and alarms.',
-                          ],
-                          actionText: 'View GitHub Release',
-                          onAction: () => launchUrlSafely(
-                            'https://github.com/PrasheelVarma/BhagavadGita/releases/tag/v1.0-android',
-                          ),
-                        ),
-                      ),
+                      Expanded(child: _buildAndroidCard()),
                     ],
                   ),
               ],
@@ -640,68 +342,158 @@ class _FeaturesComparisonSection extends StatelessWidget {
     );
   }
 
-  Widget _buildComparisonCard({
-    required String title,
-    required String badge,
-    required IconData icon,
-    required Color accentColor,
-    required List<String> points,
-    required String actionText,
-    required VoidCallback onAction,
-  }) {
+  Widget _buildWebCard() {
+    return _ComparativeCard(
+      badge: 'Zero Installation',
+      badgeColor: GitaColors.crimson,
+      badgeBgColor: GitaColors.ivory,
+      icon: Icons.language_rounded,
+      iconColor: GitaColors.crimson,
+      title: 'Web Player Experience',
+      subtitle: 'Stream instantly in any modern browser without downloading anything.',
+      points: const [
+        'Runs directly in Chrome, Safari, Firefox, Edge, and mobile browsers.',
+        'Audio continues playing uninterrupted across all website page navigation.',
+        'Interactive circular dial scrubber and synchronized linear timeline.',
+        'Configurable sleep timer presets and adjustable playback rates.',
+        'No account creation, sign-in, or software download required.',
+      ],
+      actionLabel: 'Launch Web Player',
+      onAction: onOpenPlayer,
+    );
+  }
+
+  Widget _buildAndroidCard() {
+    return _ComparativeCard(
+      badge: '100% Offline',
+      badgeColor: const Color(0xFF2E7D32),
+      badgeBgColor: const Color(0xFFE8F5E9),
+      icon: Icons.android_rounded,
+      iconColor: const Color(0xFF2E7D32),
+      title: 'Android Native Experience',
+      subtitle: 'Self-contained standalone playback with full system media integration.',
+      points: const [
+        'Audio is bundled inside the APK (~27 MB)—plays completely offline.',
+        'Runs in the background when the app is minimized or other apps are in use.',
+        'Android system notification drawer with playback and seek controls.',
+        'Lock-screen media session controls displaying album artwork.',
+        'Manages system audio focus: pauses automatically when headphones disconnect.',
+      ],
+      actionLabel: 'Download Android APK (v1.0)',
+      onAction: () => launchUrlSafely(androidReleaseUrl),
+    );
+  }
+}
+
+class _ComparativeCard extends StatelessWidget {
+  final String badge;
+  final Color badgeColor;
+  final Color badgeBgColor;
+  final IconData icon;
+  final Color iconColor;
+  final String title;
+  final String subtitle;
+  final List<String> points;
+  final String actionLabel;
+  final VoidCallback onAction;
+
+  const _ComparativeCard({
+    required this.badge,
+    required this.badgeColor,
+    required this.badgeBgColor,
+    required this.icon,
+    required this.iconColor,
+    required this.title,
+    required this.subtitle,
+    required this.points,
+    required this.actionLabel,
+    required this.onAction,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(28),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE5DDD3), width: 1.2),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: GitaColors.surfaceBorder, width: 1.2),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.03),
             blurRadius: 18,
-            offset: const Offset(0, 5),
+            offset: const Offset(0, 4),
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Header Row: Icon + Badge
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Icon(icon, color: accentColor, size: 24),
-                  const SizedBox(width: 10),
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      color: GitaColors.textDark,
-                    ),
-                  ),
-                ],
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: GitaColors.ivory,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: GitaColors.peach, width: 0.8),
+                ),
+                child: Icon(icon, color: iconColor, size: 22),
               ),
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: accentColor.withValues(alpha: 0.08),
-                  borderRadius: BorderRadius.circular(10),
+                  color: badgeBgColor,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: badgeColor.withValues(alpha: 0.3),
+                    width: 1,
+                  ),
                 ),
                 child: Text(
                   badge,
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
-                    color: accentColor,
+                    color: badgeColor,
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 18),
+
+          // Title & Subtitle
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 19,
+              fontWeight: FontWeight.w700,
+              color: GitaColors.textDark,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            subtitle,
+            style: const TextStyle(
+              fontSize: 13.5,
+              color: GitaColors.textLight,
+              height: 1.45,
+            ),
+          ),
+          const SizedBox(height: 18),
+
+          // Divider
+          Container(
+            height: 1,
+            color: GitaColors.borderLight,
+          ),
+          const SizedBox(height: 18),
+
+          // Bullet Points
           for (final point in points)
             Padding(
               padding: const EdgeInsets.only(bottom: 12),
@@ -713,16 +505,16 @@ class _FeaturesComparisonSection extends StatelessWidget {
                     child: Icon(
                       Icons.check_circle_rounded,
                       size: 16,
-                      color: accentColor,
+                      color: iconColor,
                     ),
                   ),
                   Expanded(
                     child: Text(
                       point,
                       style: const TextStyle(
-                        fontSize: 14.5,
+                        fontSize: 14,
                         color: GitaColors.textMedium,
-                        height: 1.45,
+                        height: 1.5,
                       ),
                     ),
                   ),
@@ -730,6 +522,8 @@ class _FeaturesComparisonSection extends StatelessWidget {
               ),
             ),
           const SizedBox(height: 12),
+
+          // Action Link
           MouseRegion(
             cursor: SystemMouseCursors.click,
             child: GestureDetector(
@@ -738,18 +532,18 @@ class _FeaturesComparisonSection extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    actionText,
+                    actionLabel,
                     style: TextStyle(
                       fontSize: 14.5,
                       fontWeight: FontWeight.w700,
-                      color: accentColor,
+                      color: iconColor,
                     ),
                   ),
                   const SizedBox(width: 6),
                   Icon(
                     Icons.arrow_forward_rounded,
                     size: 16,
-                    color: accentColor,
+                    color: iconColor,
                   ),
                 ],
               ),
@@ -761,50 +555,63 @@ class _FeaturesComparisonSection extends StatelessWidget {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Android App Download Banner
-// ---------------------------------------------------------------------------
+// ===========================================================================
+// 3. Three Meaningful Listening Features
+// ===========================================================================
 
-class _AndroidDownloadBanner extends StatelessWidget {
+class _ListeningFeaturesSection extends StatelessWidget {
   final double screenWidth;
 
-  const _AndroidDownloadBanner({required this.screenWidth});
+  const _ListeningFeaturesSection({required this.screenWidth});
 
   bool get _isMobile => screenWidth < GitaLayout.mobileBreakpoint;
-
-  static const String _androidReleaseUrl =
-      'https://github.com/PrasheelVarma/BhagavadGita/releases/tag/v1.0-android';
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      color: GitaColors.pureWhite,
+      color: GitaColors.warmWhite,
       child: Center(
         child: ConstrainedBox(
-          constraints:
-              const BoxConstraints(maxWidth: GitaLayout.maxContentWidth + 96),
+          constraints: const BoxConstraints(maxWidth: GitaLayout.maxContentWidth),
           child: Padding(
             padding: GitaLayout.responsivePadding(screenWidth).copyWith(
-              top: 36,
-              bottom: 48,
+              top: 56,
+              bottom: 56,
             ),
-            child: Container(
-              padding: EdgeInsets.all(_isMobile ? 24 : 36),
-              decoration: BoxDecoration(
-                color: GitaColors.darkBg,
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.12),
-                    blurRadius: 28,
-                    offset: const Offset(0, 8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _SectionTitleBlock(
+                  eyebrow: 'PURPOSE-BUILT PLAYER',
+                  title: 'Meaningful Listening Features',
+                  subtitle:
+                      'Designed from first principles to provide thoughtful, serene playback without algorithmic distraction.',
+                  isMobile: _isMobile,
+                ),
+                const SizedBox(height: 32),
+
+                // 3 Curated Feature Cards
+                if (_isMobile)
+                  Column(
+                    children: _features
+                        .map((f) => Padding(
+                              padding: const EdgeInsets.only(bottom: 16),
+                              child: _FeatureCard(feature: f),
+                            ))
+                        .toList(),
+                  )
+                else
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      for (int i = 0; i < _features.length; i++) ...[
+                        if (i > 0) const SizedBox(width: 20),
+                        Expanded(child: _FeatureCard(feature: _features[i])),
+                      ],
+                    ],
                   ),
-                ],
-              ),
-              child: _isMobile
-                  ? _buildMobileLayout()
-                  : _buildDesktopLayout(),
+              ],
             ),
           ),
         ),
@@ -812,118 +619,174 @@ class _AndroidDownloadBanner extends StatelessWidget {
     );
   }
 
-  Widget _buildDesktopLayout() {
-    return Row(
-      children: [
-        // Android Icon
-        Container(
-          width: 68,
-          height: 68,
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.08),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: GitaColors.gold.withValues(alpha: 0.3),
-              width: 1,
+  static const List<_FeatureItem> _features = [
+    _FeatureItem(
+      icon: Icons.album_outlined,
+      title: 'Dual Seeking Controls',
+      description:
+          'Seek naturally with an interactive circular dial scrubber surrounding the artwork, paired with a linear timeline slider for precise position control.',
+    ),
+    _FeatureItem(
+      icon: Icons.bedtime_outlined,
+      title: 'Sleep Timer & Playback Speed',
+      description:
+          'Set a 15, 30, 45, or 60-minute sleep timer with real-time countdown feedback, or adjust playback tempo (0.75x to 2.0x) for study and quiet contemplation.',
+    ),
+    _FeatureItem(
+      icon: Icons.spa_outlined,
+      title: 'Distraction-Free Devotion',
+      description:
+          'Dedicated strictly to listening. No commercial advertisements, no sign-in or account registration required, keeping your focus on the sacred discourse.',
+    ),
+  ];
+}
+
+class _FeatureItem {
+  final IconData icon;
+  final String title;
+  final String description;
+
+  const _FeatureItem({
+    required this.icon,
+    required this.title,
+    required this.description,
+  });
+}
+
+class _FeatureCard extends StatelessWidget {
+  final _FeatureItem feature;
+
+  const _FeatureCard({required this.feature});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(26),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: GitaColors.surfaceBorder, width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.025),
+            blurRadius: 14,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: GitaColors.ivory,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: GitaColors.peach, width: 0.8),
+            ),
+            child: Icon(
+              feature.icon,
+              size: 22,
+              color: GitaColors.crimson,
             ),
           ),
-          child: const Icon(
-            Icons.android_rounded,
-            size: 36,
-            color: GitaColors.gold,
+          const SizedBox(height: 18),
+          Text(
+            feature.title,
+            style: const TextStyle(
+              fontSize: 17,
+              fontWeight: FontWeight.w700,
+              color: GitaColors.textDark,
+            ),
           ),
-        ),
-        const SizedBox(width: 28),
-        // Explanatory Text
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Get the Native Android App (v1.0)',
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w700,
-                  color: GitaColors.textOnDark,
-                ),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                'Works completely offline once installed. Enjoy uninterrupted playback with lock-screen media notification controls and zero battery overhead.',
-                style: TextStyle(
-                  fontSize: 14.5,
-                  color: Colors.white.withValues(alpha: 0.7),
-                  height: 1.45,
-                ),
-              ),
-            ],
+          const SizedBox(height: 8),
+          Text(
+            feature.description,
+            style: const TextStyle(
+              fontSize: 14,
+              color: GitaColors.textMedium,
+              height: 1.55,
+            ),
           ),
-        ),
-        const SizedBox(width: 28),
-        // Action Button
-        _DownloadButton(onTap: () => launchUrlSafely(_androidReleaseUrl)),
-      ],
+        ],
+      ),
     );
   }
+}
 
-  Widget _buildMobileLayout() {
+// ===========================================================================
+// Reusable Shared Widgets: SectionTitleBlock, Hero Buttons
+// ===========================================================================
+
+class _SectionTitleBlock extends StatelessWidget {
+  final String eyebrow;
+  final String title;
+  final String subtitle;
+  final bool isMobile;
+
+  const _SectionTitleBlock({
+    required this.eyebrow,
+    required this.title,
+    required this.subtitle,
+    required this.isMobile,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          width: 56,
-          height: 56,
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.08),
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(
-              color: GitaColors.gold.withValues(alpha: 0.3),
-              width: 1,
-            ),
-          ),
-          child: const Icon(
-            Icons.android_rounded,
-            size: 30,
-            color: GitaColors.gold,
-          ),
-        ),
-        const SizedBox(height: 16),
-        const Text(
-          'Get the Native Android App (v1.0)',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w700,
-            color: GitaColors.textOnDark,
-          ),
-          textAlign: TextAlign.center,
+        Text(
+          eyebrow,
+          style: GitaTextStyles.eyebrow,
         ),
         const SizedBox(height: 8),
-        Text(
-          'Works completely offline after installation. Enjoy background playback and lock-screen controls.',
-          style: TextStyle(
-            fontSize: 14,
-            color: Colors.white.withValues(alpha: 0.7),
-            height: 1.45,
-          ),
-          textAlign: TextAlign.center,
+        Row(
+          children: [
+            Container(
+              width: 3.5,
+              height: isMobile ? 22 : 26,
+              decoration: BoxDecoration(
+                color: GitaColors.crimson,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                title,
+                style: GitaTextStyles.sectionHeading.copyWith(
+                  fontSize: isMobile ? 22 : 26,
+                ),
+              ),
+            ),
+          ],
         ),
-        const SizedBox(height: 22),
-        _DownloadButton(onTap: () => launchUrlSafely(_androidReleaseUrl)),
+        const SizedBox(height: 8),
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 680),
+          child: Text(
+            subtitle,
+            style: TextStyle(
+              fontSize: isMobile ? 14 : 15.5,
+              color: GitaColors.textMedium,
+              height: 1.5,
+            ),
+          ),
+        ),
       ],
     );
   }
 }
 
-// ---------------------------------------------------------------------------
-// Reusable Buttons with Hover Animation
-// ---------------------------------------------------------------------------
-
-class _PrimaryButton extends StatefulWidget {
+class _HeroPrimaryButton extends StatefulWidget {
   final String label;
   final IconData icon;
   final VoidCallback onTap;
   final bool isMobile;
 
-  const _PrimaryButton({
+  const _HeroPrimaryButton({
     required this.label,
     required this.icon,
     required this.onTap,
@@ -931,10 +794,10 @@ class _PrimaryButton extends StatefulWidget {
   });
 
   @override
-  State<_PrimaryButton> createState() => _PrimaryButtonState();
+  State<_HeroPrimaryButton> createState() => _HeroPrimaryButtonState();
 }
 
-class _PrimaryButtonState extends State<_PrimaryButton> {
+class _HeroPrimaryButtonState extends State<_HeroPrimaryButton> {
   bool _isHovered = false;
 
   @override
@@ -946,9 +809,9 @@ class _PrimaryButtonState extends State<_PrimaryButton> {
       child: GestureDetector(
         onTap: widget.onTap,
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 180),
+          duration: const Duration(milliseconds: 160),
           padding: EdgeInsets.symmetric(
-            horizontal: widget.isMobile ? 24 : 30,
+            horizontal: widget.isMobile ? 22 : 26,
             vertical: widget.isMobile ? 13 : 15,
           ),
           decoration: BoxDecoration(
@@ -957,25 +820,27 @@ class _PrimaryButtonState extends State<_PrimaryButton> {
                   ? [GitaColors.crimson, const Color(0xFFC62828)]
                   : [GitaColors.red, GitaColors.crimson],
             ),
-            borderRadius: BorderRadius.circular(28),
+            borderRadius: BorderRadius.circular(10),
             boxShadow: [
               BoxShadow(
-                color: GitaColors.red.withValues(alpha: _isHovered ? 0.38 : 0.22),
-                blurRadius: _isHovered ? 18 : 10,
-                offset: const Offset(0, 4),
+                color: GitaColors.red.withValues(alpha: _isHovered ? 0.35 : 0.20),
+                blurRadius: _isHovered ? 14 : 8,
+                offset: const Offset(0, 3),
               ),
             ],
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(widget.icon, color: Colors.white, size: 22),
+              Icon(widget.icon, color: Colors.white, size: 21),
               const SizedBox(width: 8),
               Text(
                 widget.label,
-                style: GitaTextStyles.buttonLabel.copyWith(
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.2,
                 ),
               ),
             ],
@@ -986,13 +851,13 @@ class _PrimaryButtonState extends State<_PrimaryButton> {
   }
 }
 
-class _SecondaryButton extends StatefulWidget {
+class _HeroSecondaryButton extends StatefulWidget {
   final String label;
   final IconData icon;
   final VoidCallback onTap;
   final bool isMobile;
 
-  const _SecondaryButton({
+  const _HeroSecondaryButton({
     required this.label,
     required this.icon,
     required this.onTap,
@@ -1000,10 +865,10 @@ class _SecondaryButton extends StatefulWidget {
   });
 
   @override
-  State<_SecondaryButton> createState() => _SecondaryButtonState();
+  State<_HeroSecondaryButton> createState() => _HeroSecondaryButtonState();
 }
 
-class _SecondaryButtonState extends State<_SecondaryButton> {
+class _HeroSecondaryButtonState extends State<_HeroSecondaryButton> {
   bool _isHovered = false;
 
   @override
@@ -1015,22 +880,22 @@ class _SecondaryButtonState extends State<_SecondaryButton> {
       child: GestureDetector(
         onTap: widget.onTap,
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 180),
+          duration: const Duration(milliseconds: 160),
           padding: EdgeInsets.symmetric(
-            horizontal: widget.isMobile ? 22 : 28,
+            horizontal: widget.isMobile ? 20 : 24,
             vertical: widget.isMobile ? 12 : 14,
           ),
           decoration: BoxDecoration(
             color: _isHovered ? Colors.white : GitaColors.ivory,
-            borderRadius: BorderRadius.circular(28),
+            borderRadius: BorderRadius.circular(10),
             border: Border.all(
-              color: _isHovered ? GitaColors.crimson : GitaColors.peach,
-              width: 1.4,
+              color: _isHovered ? GitaColors.crimson : GitaColors.surfaceBorder,
+              width: 1.3,
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.03),
-                blurRadius: 8,
+                color: Colors.black.withValues(alpha: 0.02),
+                blurRadius: 6,
                 offset: const Offset(0, 2),
               ),
             ],
@@ -1047,68 +912,10 @@ class _SecondaryButtonState extends State<_SecondaryButton> {
               Text(
                 widget.label,
                 style: TextStyle(
-                  fontSize: 15,
+                  fontSize: 14.5,
                   fontWeight: FontWeight.w700,
                   color: _isHovered ? GitaColors.crimson : GitaColors.textDark,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _DownloadButton extends StatefulWidget {
-  final VoidCallback onTap;
-
-  const _DownloadButton({required this.onTap});
-
-  @override
-  State<_DownloadButton> createState() => _DownloadButtonState();
-}
-
-class _DownloadButtonState extends State<_DownloadButton> {
-  bool _isHovered = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
-      child: GestureDetector(
-        onTap: widget.onTap,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 180),
-          padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 14),
-          decoration: BoxDecoration(
-            color: _isHovered ? GitaColors.gold : const Color(0xFFFFE082),
-            borderRadius: BorderRadius.circular(24),
-            boxShadow: [
-              BoxShadow(
-                color: GitaColors.gold.withValues(alpha: _isHovered ? 0.4 : 0.2),
-                blurRadius: 16,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: const Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.download_rounded,
-                size: 20,
-                color: GitaColors.darkBg,
-              ),
-              SizedBox(width: 8),
-              Text(
-                'Download APK v1.0',
-                style: TextStyle(
-                  fontSize: 14.5,
-                  fontWeight: FontWeight.w800,
-                  color: GitaColors.darkBg,
+                  letterSpacing: 0.2,
                 ),
               ),
             ],
